@@ -253,31 +253,38 @@ const roster=document.getElementById('roster'), feed=document.getElementById('fe
       outfit=document.getElementById('outfit'), ring=document.getElementById('ring'),
       ringval=document.getElementById('ringval'), mission=document.getElementById('mission');
 const nodeEls={};
+// HTML-escape every dynamic value before it touches innerHTML. Listing titles,
+// descriptions and seller country are UNTRUSTED (a prompt-injection / XSS vector),
+// so they are escaped at the render boundary.
+function esc(s){return String(s==null?'':s).replace(/[&<>"']/g,
+  c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
 ROLES.forEach(([id,name,desc])=>{
   const n=document.createElement('div'); n.className='node '+id;
-  n.innerHTML=`<div class="dot"></div><div><b>${name}</b><span>${desc}</span></div>`;
+  n.innerHTML=`<div class="dot"></div><div><b>${esc(name)}</b><span>${esc(desc)}</span></div>`;
   roster.appendChild(n); nodeEls[id]=n;
 });
 let CUR="brunch", DATA=SCEN.brunch.events, i=0, timer=null;
 function buildOutfit(){
   outfit.innerHTML='';
   SCEN[CUR].slots.forEach(c=>{const t=document.createElement('div');t.className='tile';t.id='tile-'+c;
-    t.innerHTML=`<div class="c">${c}</div><div class="t">—</div><div class="p"></div>`;outfit.appendChild(t);});
+    t.innerHTML=`<div class="c">${esc(c)}</div><div class="t">—</div><div class="p"></div>`;outfit.appendChild(t);});
 }
 function actorKey(a){return a&&a.startsWith('seller')?'seller':a;}
 function setActive(a){Object.values(nodeEls).forEach(n=>n.classList.remove('active'));
   const k=actorKey(a); if(nodeEls[k])nodeEls[k].classList.add('active');}
 function setBudget(used){const p=Math.min(100,used/SCEN[CUR].cap*100);
   ring.style.setProperty('--p',p); ringval.textContent='€'+used;}
+function safeUrl(u){ u=String(u||''); return /^https?:\/\//i.test(u)?esc(u):''; }
 function findCards(cands){
   return '<div class="cards">'+cands.map(o=>{
-    const tags=(o.attrs||[]).map(a=>`<span class="ct">${a}</span>`).join('')
+    const tags=(o.attrs||[]).map(a=>`<span class="ct">${esc(a)}</span>`).join('')
       +(o.source==='gemini-escalation'?'<span class="ct warn">GLiNER unsure → Gemini</span>':'')
-      +(o.country?`<span class="ct">${o.country}</span>`:'')
-      +(o.best?`<span class="ct best">best fit ${o.fit}%</span>`:'');
-    const img = o.photo?`<div class="thumb"><img src="${o.photo}" alt="" onerror="this.style.display='none'"></div>`:'<div class="thumb"></div>';
-    return `<div class="card">${img}<div class="cbody"><div class="cr"><span class="cti">${o.title}</span><span class="cp">€${o.price} · ${o.size}</span></div>`
-      +`<div class="cd">“${o.desc}” <span class="clg">[${o.lang}]</span></div><div class="ctags">${tags}</div></div></div>`;
+      +(o.country?`<span class="ct">${esc(o.country)}</span>`:'')
+      +(o.best?`<span class="ct best">best fit ${esc(o.fit)}%</span>`:'');
+    const u=safeUrl(o.photo);
+    const img = u?`<div class="thumb"><img src="${u}" alt="" onerror="this.style.display='none'"></div>`:'<div class="thumb"></div>';
+    return `<div class="card">${img}<div class="cbody"><div class="cr"><span class="cti">${esc(o.title)}</span><span class="cp">€${esc(o.price)} · ${esc(o.size)}</span></div>`
+      +`<div class="cd">“${esc(o.desc)}” <span class="clg">[${esc(o.lang)}]</span></div><div class="ctags">${tags}</div></div></div>`;
   }).join('')+'</div>';
 }
 const preview=document.getElementById('preview'), previewimg=document.getElementById('previewimg'),
@@ -298,9 +305,9 @@ function render(ev){
   setActive(ev.actor);
   const row=document.createElement('div'); row.className='ev '+ev.kind;
   const body = ev.kind==='candidates' && ev.candidates
-    ? `<span class="k">finds</span>${ev.text}${findCards(ev.candidates)}`
-    : `<span class="k">${ev.kind.replace('_',' ')}</span>${ev.text||''}`;
-  row.innerHTML=`<div class="who">${ev.actor}</div><div class="body">${body}</div>`;
+    ? `<span class="k">finds</span>${esc(ev.text)}${findCards(ev.candidates)}`
+    : `<span class="k">${esc(ev.kind.replace('_',' '))}</span>${esc(ev.text||'')}`;
+  row.innerHTML=`<div class="who">${esc(ev.actor)}</div><div class="body">${body}</div>`;
   feed.appendChild(row); feed.scrollTop=feed.scrollHeight;
   const m=/Acquire (\w+):\s*'([^']+)'\s*@\s*€(\d+)/.exec(ev.text||'');
   if(m){const t=document.getElementById('tile-'+m[1]); if(t){t.classList.add('filled');

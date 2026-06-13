@@ -177,6 +177,11 @@ var SCEN={
 
 var log=document.getElementById("log"),prog=document.getElementById("prog"),tray=document.getElementById("tray");
 var cur="brunch",i=0,timer=null;
+// Escape text fields before innerHTML. (This storyboard's data is all authored
+// constants — `raw` is trusted hand-written markup — but we escape the textual
+// fields anyway to keep the render boundary safe.)
+function esc(s){return String(s==null?'':s).replace(/[&<>"']/g,
+  function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];});}
 
 function buildTray(){
   tray.innerHTML="";
@@ -184,7 +189,7 @@ function buildTray(){
   tray.style.gridTemplateColumns="repeat("+Math.max(1,Math.min(4,slots.length||4))+",1fr)";
   slots.forEach(function(s){
     var d=document.createElement("div");d.className="slot";d.id="slot-"+s;
-    d.innerHTML='<div class="c">'+s+'</div><div class="t" style="color:var(--muted)">—</div><div class="p"></div>';
+    d.innerHTML='<div class="c">'+esc(s)+'</div><div class="t" style="color:var(--muted)">—</div><div class="p"></div>';
     tray.appendChild(d);
   });
 }
@@ -194,12 +199,12 @@ function applyOps(o){
   if(o.fill){var s=document.getElementById("slot-"+o.fill.s);
     if(!s){s=document.createElement("div");s.id="slot-"+o.fill.s;tray.appendChild(s);}
     s.className="slot full";
-    s.innerHTML='<div class="c">'+o.fill.s+'</div><div class="t">'+o.fill.t+'</div><div class="p">€'+o.fill.p+'</div>';}
+    s.innerHTML='<div class="c">'+esc(o.fill.s)+'</div><div class="t">'+esc(o.fill.t)+'</div><div class="p">€'+esc(o.fill.p)+'</div>';}
 }
 function render(s){
   var row=document.createElement("div");row.className="ev";
-  var voice=s.v?'<div class="voice"><span class="vt">voice ['+(s.vt||'')+'] → shown as text:</span> <span class="vq">“'+s.v+'”</span></div>':'';
-  row.innerHTML='<div class="hd"><span class="k '+s.k+'">'+s.k+'</span><span class="who">'+s.a+'</span></div><div>'+(s.raw||s.h||"")+'</div>'+voice;
+  var voice=s.v?'<div class="voice"><span class="vt">voice ['+esc(s.vt||'')+'] → shown as text:</span> <span class="vq">“'+esc(s.v)+'”</span></div>':'';
+  row.innerHTML='<div class="hd"><span class="k '+esc(s.k)+'">'+esc(s.k)+'</span><span class="who">'+esc(s.a)+'</span></div><div>'+(s.raw||esc(s.h)||"")+'</div>'+voice;
   log.appendChild(row);applyOps(s.ops);
 }
 function next(){var st=SCEN[cur].steps;if(i>=st.length){stop();return;}render(st[i]);i++;prog.textContent="step "+i+" / "+st.length;}

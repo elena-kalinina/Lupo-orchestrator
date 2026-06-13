@@ -146,7 +146,7 @@ against your key before the demo.
 
 ---
 
-## Partners & prizes
+## Partners
 - **Gemini** (qualifying) — structured outputs (stylist, extraction escalation) and TTS
   (the voice pings); the arbitration target for hard cases.
 - **Fastino / GLiNER** — the small multilingual extractor; **Pioneer** for fine-tuning on
