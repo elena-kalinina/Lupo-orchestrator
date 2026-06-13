@@ -83,18 +83,47 @@
 
 <script>
 var CAP=60;
+// Build the storyboard with the DOM API (textContent) instead of innerHTML, so
+// no string is ever parsed as markup. Nodes are created once and cloned on each
+// render, which keeps replay safe.
+function el(tag, cls, text){ var e=document.createElement(tag);
+  if(cls) e.className=cls; if(text!=null) e.textContent=text; return e; }
 function card(o){
   var t=o.t||o.title, p=(o.p!=null?o.p:o.price), sz=o.sz||o.size||'', d=o.d||o.desc||'';
   var note=o.note||(o.source==='gemini-escalation'?'GLiNER unsure → Gemini':'');
-  var tags=(o.attrs||[]).map(function(a){return '<span class="tag">'+a+'</span>'}).join('');
-  if(note) tags+='<span class="tag warn">'+note+'</span>';
-  if(o.country) tags+='<span class="tag">'+o.country+'</span>';
-  if(o.best) tags+='<span class="tag best">best fit '+(o.fit||'')+'%</span>';
-  var img=o.photo?'<div class="thumb"><img src="'+o.photo+'" alt="" onerror="this.style.display=\'none\'"></div>':'';
-  return '<div class="card'+(o.photo?' withimg':'')+'">'+img+'<div class="cbody"><div class="r1"><span class="ti">'+t+'</span><span class="pr">€'+p+' · '+sz+'</span></div><div class="d">“'+d+'” <span class="lg">['+o.lang+']</span></div><div class="tags">'+tags+'</div></div></div>';
+  var c=el('div','card'+(o.photo?' withimg':''));
+  if(o.photo){ var th=el('div','thumb'); var im=document.createElement('img');
+    im.src=o.photo; im.alt=''; im.onerror=function(){ this.style.display='none'; };
+    th.appendChild(im); c.appendChild(th); }
+  var cb=el('div','cbody');
+  var r1=el('div','r1'); r1.appendChild(el('span','ti',t));
+  r1.appendChild(el('span','pr','€'+p+' · '+sz)); cb.appendChild(r1);
+  var dd=el('div','d'); dd.appendChild(document.createTextNode('“'+d+'” '));
+  dd.appendChild(el('span','lg','['+o.lang+']')); cb.appendChild(dd);
+  var tg=el('div','tags');
+  (o.attrs||[]).forEach(function(a){ tg.appendChild(el('span','tag',a)); });
+  if(note) tg.appendChild(el('span','tag warn',note));
+  if(o.country) tg.appendChild(el('span','tag',o.country));
+  if(o.best) tg.appendChild(el('span','tag best','best fit '+(o.fit||'')+'%'));
+  cb.appendChild(tg); c.appendChild(cb);
+  return c;
 }
 function search(cat,items,pick){
-  return '<div style="font-weight:500;margin-bottom:2px">running '+cat+' search…</div>'+items.map(card).join('')+'<div style="margin-top:6px">Pick: <b>'+pick+'</b></div>';
+  var head=el('div',null,'running '+cat+' search…');
+  head.style.fontWeight='500'; head.style.marginBottom='2px';
+  var pk=el('div'); pk.style.marginTop='6px';
+  pk.appendChild(document.createTextNode('Pick: ')); pk.appendChild(el('b',null,pick));
+  return [head].concat(items.map(card)).concat([pk]);
+}
+function nego(prefix, bold, suffix){
+  var d=el('div','nego'); d.appendChild(document.createTextNode(prefix));
+  d.appendChild(el('b',null,bold));
+  if(suffix) d.appendChild(document.createTextNode(suffix));
+  return d;
+}
+function warnNote(text){
+  var d=el('div'); d.style.marginTop='6px';
+  d.appendChild(el('span','tag warn',text)); return d;
 }
 
 var SCEN={
@@ -110,26 +139,26 @@ var SCEN={
   {k:"escalation",a:"coordinator",h:"Approve this budget split?",vt:"dry, German",v:"Kurz und schmerzlos: passt die Aufteilung?"},
   {k:"you",a:"you",h:"Approve."},
   {k:"system",a:"coordinator",h:"Running searches in parallel: dress · shoes · bag · jewellery."},
-  {k:"buyer",a:"buyer",raw:search("dress",[
+  {k:"buyer",a:"buyer",body:search("dress",[
     {t:"Zara floral midi casual dress",p:32,sz:"M",lang:"fr",country:"France",d:"Robe midi fleurie en coton, style bohème, taille normale",attrs:["cotton","boho","true-to-size"],best:1,fit:94},
     {t:"H&M cream sundress",p:18,sz:"M",lang:"nl",country:"Netherlands",d:"Lichte zomerjurk, katoen, valt klein",attrs:["cotton","fits-small"]},
     {t:"Mango midi floral",p:24,sz:"S",lang:"it",country:"Italy",d:"vestito midi a fiori, nuovo con cartellino",attrs:[],source:"gemini-escalation"}
   ],"Zara floral midi — €32")},
   {k:"escalation",a:"coordinator",h:"Dress is €32 — €8 over its €24 budget. Raiding other categories risks the look. Negotiate, or stretch?",vt:"wry, English",v:"Tiny snag — the dress is over budget. Haggle, or stretch?"},
   {k:"you",a:"you",h:"Negotiate."},
-  {k:"negotiation",a:"negotiator ↔ seller",raw:'<div class="nego">open €24 → seller counter €29 → raise €26 → <b>deal €26 (saved €6)</b></div>',ops:{used:26,fill:{s:"dress",t:"Zara floral midi",p:26}}},
-  {k:"buyer",a:"buyer",raw:search("shoes",[
+  {k:"negotiation",a:"negotiator ↔ seller",body:nego('open €24 → seller counter €29 → raise €26 → ','deal €26 (saved €6)'),ops:{used:26,fill:{s:"dress",t:"Zara floral midi",p:26}}},
+  {k:"buyer",a:"buyer",body:search("shoes",[
     {t:"Tan ballet flats leather",p:14,sz:"38",lang:"fr",country:"France",d:"Ballerines en cuir véritable, taille normale",attrs:["leather","true-to-size"],best:1,fit:94},
     {t:"Beige ballet flats",p:12,sz:"38",lang:"nl",country:"Netherlands",d:"leren ballerina's, valt groot",attrs:["leather","fits-large"]}
   ],"Tan ballet flats — €14"),ops:{used:40,fill:{s:"shoes",t:"Tan ballet flats",p:14}}},
-  {k:"buyer",a:"buyer",raw:search("bag",[
+  {k:"buyer",a:"buyer",body:search("bag",[
     {t:"Mini summer shoulder bag",p:10,sz:"OS",lang:"fr",country:"France",d:"petit sac d'été en raphia, style bohème",attrs:["boho"],best:1,fit:76},
     {t:"Small cream shoulder bag",p:13,sz:"OS",lang:"nl",country:"Netherlands",d:"kleine schoudertas, leer, nieuwstaat",attrs:["leather"]}
   ],"Mini shoulder bag — €10"),ops:{used:50,fill:{s:"bag",t:"Mini shoulder bag",p:10}}},
-  {k:"buyer",a:"buyer",raw:search("jewellery",[
+  {k:"buyer",a:"buyer",body:search("jewellery",[
     {t:"Gold dainty hoops earrings",p:8,sz:"OS",lang:"fr",country:"France",d:"créoles dorées délicates, neuves",attrs:["gold","hoops"],best:1,fit:94},
     {t:"Gold hoop earrings small",p:6,sz:"OS",lang:"nl",country:"Netherlands",d:"kleine gouden oorringen",attrs:["gold","hoops"]}
-  ],"Gold dainty hoops — €8")+'<div style="margin-top:6px"><span class="tag warn">procurement: €1 over absorbed from slack</span></div>',ops:{used:58,fill:{s:"jewellery",t:"Gold dainty hoops",p:8}}},
+  ],"Gold dainty hoops — €8").concat([warnNote('procurement: €1 over absorbed from slack')]),ops:{used:58,fill:{s:"jewellery",t:"Gold dainty hoops",p:8}}},
   {k:"deal",a:"coordinator",h:"Outfit complete — 4/4 items, €58 / €60. €6 saved by negotiating."},
   {k:"system",a:"coordinator",h:"Finds came from 4 sellers in 3 countries — so handover is per item, not one pickup."},
   {k:"escalation",a:"coordinator",h:"Confirm purchase — €58 across the four sellers?",vt:"deadpan, Russian",v:"Vsyo gotovo. Pokupaem, da?"},
@@ -148,25 +177,25 @@ var SCEN={
   {k:"escalation",a:"coordinator",h:"Approve this budget split?",vt:"dry, German",v:"Aufteilung ok? Sag ja."},
   {k:"you",a:"you",h:"Approve."},
   {k:"system",a:"coordinator",h:"Running searches: top · bottoms · accessories · boots (hero last)."},
-  {k:"buyer",a:"buyer",raw:search("top",[
+  {k:"buyer",a:"buyer",body:search("top",[
     {t:"Mesh sparkle crop top",p:15,sz:"S",lang:"fr",country:"France",d:"haut résille à paillettes, style rave",attrs:["mesh","sparkle"],best:1,fit:76},
     {t:"Black mesh top",p:11,sz:"M",lang:"nl",country:"Netherlands",d:"zwart mesh topje, festival",attrs:["mesh"]}
   ],"Mesh sparkle crop top — €15"),ops:{used:15,fill:{s:"top",t:"Mesh sparkle top",p:15}}},
-  {k:"buyer",a:"buyer",raw:search("bottoms",[
+  {k:"buyer",a:"buyer",body:search("bottoms",[
     {t:"Cargo techno pants black",p:18,sz:"M",lang:"nl",country:"Netherlands",d:"cargo broek, techno stijl",attrs:["cargo","techno"],best:1,fit:76},
     {t:"Black cargo shorts",p:14,sz:"S",lang:"fr",country:"France",d:"short cargo noir",attrs:["cargo"]}
   ],"Cargo techno pants — €18"),ops:{used:33,fill:{s:"bottoms",t:"Cargo techno pants",p:18}}},
-  {k:"buyer",a:"buyer",raw:search("accessories",[
+  {k:"buyer",a:"buyer",body:search("accessories",[
     {t:"Holographic sunglasses rave",p:6,sz:"OS",lang:"it",country:"Italy",d:"occhiali da sole olografici, stile y2k",attrs:["holographic","y2k"],best:1,fit:76},
     {t:"Neon bum bag",p:9,sz:"OS",lang:"fr",country:"France",d:"sac banane fluo",attrs:[]}
   ],"Holographic sunglasses — €6"),ops:{used:39,fill:{s:"accessories",t:"Holographic shades",p:6}}},
-  {k:"buyer",a:"buyer",raw:search("boots",[
+  {k:"buyer",a:"buyer",body:search("boots",[
     {t:"Buffalo platform chunky boots",p:40,sz:"39",lang:"de",country:"Germany",d:"Plateaustiefel, robust, Kunstleder",attrs:["platform","chunky"],best:1,fit:88},
     {t:"Black platform boots",p:28,sz:"39",lang:"nl",country:"Netherlands",d:"zwarte plateau laarzen",attrs:["platform"]}
   ],"Buffalo platform chunky boots — €40")},
   {k:"escalation",a:"coordinator",h:"Boots are €40 — €16 over their €24 budget, and they're the hero of the look. Negotiate, or stretch?",vt:"hyped, German",v:"Die Boots sind der Star — strecken wir das Budget?"},
   {k:"you",a:"you",h:"Stretch."},
-  {k:"budget",a:"procurement",raw:'<div class="nego">slack: top €5 + bottoms €6 + accessories €6 = €17  →  <b>reallocated €16 → boots</b> (total stays €80)</div>',ops:{used:79,fill:{s:"boots",t:"Buffalo platform boots",p:40}}},
+  {k:"budget",a:"procurement",body:nego('slack: top €5 + bottoms €6 + accessories €6 = €17  →  ','reallocated €16 → boots',' (total stays €80)'),ops:{used:79,fill:{s:"boots",t:"Buffalo platform boots",p:40}}},
   {k:"deal",a:"coordinator",h:"Outfit complete — 4/4 items, €79 / €80. Budget rebalanced, not overspent."},
   {k:"system",a:"coordinator",h:"Finds came from 4 sellers in 4 countries — handover is per item."},
   {k:"escalation",a:"coordinator",h:"Confirm purchase — €79 across the four sellers?",vt:"deadpan, Russian",v:"Poehali — pokupaem?"},
@@ -177,19 +206,17 @@ var SCEN={
 
 var log=document.getElementById("log"),prog=document.getElementById("prog"),tray=document.getElementById("tray");
 var cur="brunch",i=0,timer=null;
-// Escape text fields before innerHTML. (This storyboard's data is all authored
-// constants — `raw` is trusted hand-written markup — but we escape the textual
-// fields anyway to keep the render boundary safe.)
-function esc(s){return String(s==null?'':s).replace(/[&<>"']/g,
-  function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];});}
+function clear(node){ while(node.firstChild) node.removeChild(node.firstChild); }
 
 function buildTray(){
-  tray.innerHTML="";
+  clear(tray);
   var slots=SCEN[cur].slots||[];
   tray.style.gridTemplateColumns="repeat("+Math.max(1,Math.min(4,slots.length||4))+",1fr)";
   slots.forEach(function(s){
-    var d=document.createElement("div");d.className="slot";d.id="slot-"+s;
-    d.innerHTML='<div class="c">'+esc(s)+'</div><div class="t" style="color:var(--muted)">—</div><div class="p"></div>';
+    var d=el('div','slot'); d.id='slot-'+s;
+    d.appendChild(el('div','c',s));
+    var t=el('div','t','—'); t.style.color='var(--muted)'; d.appendChild(t);
+    d.appendChild(el('div','p'));
     tray.appendChild(d);
   });
 }
@@ -197,20 +224,39 @@ function applyOps(o){
   if(!o)return;
   if(o.used!=null){document.getElementById("used").textContent="€"+o.used;document.getElementById("fill").style.width=Math.round(o.used/SCEN[cur].cap*100)+"%";}
   if(o.fill){var s=document.getElementById("slot-"+o.fill.s);
-    if(!s){s=document.createElement("div");s.id="slot-"+o.fill.s;tray.appendChild(s);}
-    s.className="slot full";
-    s.innerHTML='<div class="c">'+esc(o.fill.s)+'</div><div class="t">'+esc(o.fill.t)+'</div><div class="p">€'+esc(o.fill.p)+'</div>';}
+    if(!s){s=el('div');s.id="slot-"+o.fill.s;tray.appendChild(s);}
+    s.className="slot full"; clear(s);
+    s.appendChild(el('div','c',o.fill.s));
+    s.appendChild(el('div','t',o.fill.t));
+    s.appendChild(el('div','p','€'+o.fill.p));}
 }
 function render(s){
-  var row=document.createElement("div");row.className="ev";
-  var voice=s.v?'<div class="voice"><span class="vt">voice ['+esc(s.vt||'')+'] → shown as text:</span> <span class="vq">“'+esc(s.v)+'”</span></div>':'';
-  row.innerHTML='<div class="hd"><span class="k '+esc(s.k)+'">'+esc(s.k)+'</span><span class="who">'+esc(s.a)+'</span></div><div>'+(s.raw||esc(s.h)||"")+'</div>'+voice;
+  var row=el('div','ev');
+  var hd=el('div','hd');
+  hd.appendChild(el('span','k '+s.k, s.k));
+  hd.appendChild(el('span','who', s.a));
+  row.appendChild(hd);
+  var bodyDiv=el('div');
+  if(s.body){
+    var parts=Array.isArray(s.body)?s.body:[s.body];
+    parts.forEach(function(n){ bodyDiv.appendChild(n.cloneNode(true)); });
+  } else {
+    bodyDiv.textContent=(s.h!=null?s.h:'');
+  }
+  row.appendChild(bodyDiv);
+  if(s.v){
+    var voice=el('div','voice');
+    voice.appendChild(el('span','vt','voice ['+(s.vt||'')+'] → shown as text:'));
+    voice.appendChild(document.createTextNode(' '));
+    voice.appendChild(el('span','vq','“'+s.v+'”'));
+    row.appendChild(voice);
+  }
   log.appendChild(row);applyOps(s.ops);
 }
 function next(){var st=SCEN[cur].steps;if(i>=st.length){stop();return;}render(st[i]);i++;prog.textContent="step "+i+" / "+st.length;}
 function stop(){clearInterval(timer);timer=null;document.getElementById("play").textContent="▶ play";}
 function play(){if(timer){stop();return;}document.getElementById("play").textContent="⏸ pause";timer=setInterval(function(){var st=SCEN[cur].steps;if(i>=st.length)stop();else next();},1300);}
-function reset(){stop();i=0;log.innerHTML="";
+function reset(){stop();i=0;clear(log);
   document.getElementById("brief").textContent=SCEN[cur].brief;
   document.getElementById("cap").textContent="€"+SCEN[cur].cap;
   document.getElementById("used").textContent="€0";document.getElementById("fill").style.width="0%";
@@ -219,7 +265,11 @@ function reset(){stop();i=0;log.innerHTML="";
 function mapKind(k,a){return ({human_reply:"you",escalation:"escalation",budget:"budget",deal:"deal",negotiation:"negotiation",candidates:"buyer",task:"system",decision:"deal",message:(a==="stylist"?"stylist":"buyer")})[k]||"system";}
 function liveStep(ev){
   var s={k:mapKind(ev.kind,ev.actor),a:ev.actor};
-  if(ev.kind==="candidates"&&ev.candidates){s.raw='<div style="font-weight:500;margin-bottom:2px">running '+(ev.category||"")+' search…</div>'+ev.candidates.map(card).join('');}
+  if(ev.kind==="candidates"&&ev.candidates){
+    var head=el('div',null,'running '+(ev.category||"")+' search…');
+    head.style.fontWeight='500'; head.style.marginBottom='2px';
+    s.body=[head].concat(ev.candidates.map(card));
+  }
   else s.h=ev.text||"";
   var m=/Acquire (\w+):\s*'([^']+)'\s*@\s*€(\d+)\s*\|\s*remaining €(\d+)/.exec(ev.text||"");
   if(m)s.ops={used:CAP-parseInt(m[4]),fill:{s:m[1],t:m[2],p:m[3]}};

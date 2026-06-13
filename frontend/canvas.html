@@ -253,39 +253,59 @@ const roster=document.getElementById('roster'), feed=document.getElementById('fe
       outfit=document.getElementById('outfit'), ring=document.getElementById('ring'),
       ringval=document.getElementById('ringval'), mission=document.getElementById('mission');
 const nodeEls={};
-// HTML-escape every dynamic value before it touches innerHTML. Listing titles,
-// descriptions and seller country are UNTRUSTED (a prompt-injection / XSS vector),
-// so they are escaped at the render boundary.
-function esc(s){return String(s==null?'':s).replace(/[&<>"']/g,
-  c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
+// Build every node with the DOM API instead of innerHTML. Listing titles,
+// descriptions and seller country are UNTRUSTED (a prompt-injection / XSS
+// vector); textContent neutralises any markup they may contain.
+function el(tag, cls, text){ const e=document.createElement(tag);
+  if(cls) e.className=cls; if(text!=null) e.textContent=text; return e; }
 ROLES.forEach(([id,name,desc])=>{
-  const n=document.createElement('div'); n.className='node '+id;
-  n.innerHTML=`<div class="dot"></div><div><b>${esc(name)}</b><span>${esc(desc)}</span></div>`;
+  const n=el('div','node '+id);
+  n.appendChild(el('div','dot'));
+  const wrap=el('div'); wrap.appendChild(el('b',null,name)); wrap.appendChild(el('span',null,desc));
+  n.appendChild(wrap);
   roster.appendChild(n); nodeEls[id]=n;
 });
 let CUR="brunch", DATA=SCEN.brunch.events, i=0, timer=null;
 function buildOutfit(){
   outfit.innerHTML='';
-  SCEN[CUR].slots.forEach(c=>{const t=document.createElement('div');t.className='tile';t.id='tile-'+c;
-    t.innerHTML=`<div class="c">${esc(c)}</div><div class="t">—</div><div class="p"></div>`;outfit.appendChild(t);});
+  SCEN[CUR].slots.forEach(c=>{const t=el('div','tile'); t.id='tile-'+c;
+    t.appendChild(el('div','c',c)); t.appendChild(el('div','t','—')); t.appendChild(el('div','p'));
+    outfit.appendChild(t);});
 }
 function actorKey(a){return a&&a.startsWith('seller')?'seller':a;}
 function setActive(a){Object.values(nodeEls).forEach(n=>n.classList.remove('active'));
   const k=actorKey(a); if(nodeEls[k])nodeEls[k].classList.add('active');}
 function setBudget(used){const p=Math.min(100,used/SCEN[CUR].cap*100);
   ring.style.setProperty('--p',p); ringval.textContent='€'+used;}
-function safeUrl(u){ u=String(u||''); return /^https?:\/\//i.test(u)?esc(u):''; }
-function findCards(cands){
-  return '<div class="cards">'+cands.map(o=>{
-    const tags=(o.attrs||[]).map(a=>`<span class="ct">${esc(a)}</span>`).join('')
-      +(o.source==='gemini-escalation'?'<span class="ct warn">GLiNER unsure → Gemini</span>':'')
-      +(o.country?`<span class="ct">${esc(o.country)}</span>`:'')
-      +(o.best?`<span class="ct best">best fit ${esc(o.fit)}%</span>`:'');
+function safeUrl(u){ u=String(u||''); return /^https?:\/\//i.test(u)?u:''; }
+function buildCards(cands){
+  const wrap=el('div','cards');
+  cands.forEach(o=>{
+    const card=el('div','card');
+    const thumb=el('div','thumb');
     const u=safeUrl(o.photo);
-    const img = u?`<div class="thumb"><img src="${u}" alt="" onerror="this.style.display='none'"></div>`:'<div class="thumb"></div>';
-    return `<div class="card">${img}<div class="cbody"><div class="cr"><span class="cti">${esc(o.title)}</span><span class="cp">€${esc(o.price)} · ${esc(o.size)}</span></div>`
-      +`<div class="cd">“${esc(o.desc)}” <span class="clg">[${esc(o.lang)}]</span></div><div class="ctags">${tags}</div></div></div>`;
-  }).join('')+'</div>';
+    if(u){ const img=document.createElement('img'); img.src=u; img.alt='';
+      img.onerror=function(){ this.style.display='none'; }; thumb.appendChild(img); }
+    card.appendChild(thumb);
+    const cbody=el('div','cbody');
+    const cr=el('div','cr');
+    cr.appendChild(el('span','cti',o.title));
+    cr.appendChild(el('span','cp','€'+o.price+' · '+o.size));
+    cbody.appendChild(cr);
+    const cd=el('div','cd');
+    cd.appendChild(document.createTextNode('“'+(o.desc==null?'':o.desc)+'” '));
+    cd.appendChild(el('span','clg','['+o.lang+']'));
+    cbody.appendChild(cd);
+    const ctags=el('div','ctags');
+    (o.attrs||[]).forEach(a=>ctags.appendChild(el('span','ct',a)));
+    if(o.source==='gemini-escalation') ctags.appendChild(el('span','ct warn','GLiNER unsure → Gemini'));
+    if(o.country) ctags.appendChild(el('span','ct',o.country));
+    if(o.best) ctags.appendChild(el('span','ct best','best fit '+o.fit+'%'));
+    cbody.appendChild(ctags);
+    card.appendChild(cbody);
+    wrap.appendChild(card);
+  });
+  return wrap;
 }
 const preview=document.getElementById('preview'), previewimg=document.getElementById('previewimg'),
       previewcap=document.getElementById('previewcap'), promptEl=document.getElementById('prompt'),
@@ -303,11 +323,18 @@ function showPreview(url,caption){
 function render(ev){
   if(ev.kind==='preview'){ showPreview(ev.image, ev.text||'Outfit preview'); return; }
   setActive(ev.actor);
-  const row=document.createElement('div'); row.className='ev '+ev.kind;
-  const body = ev.kind==='candidates' && ev.candidates
-    ? `<span class="k">finds</span>${esc(ev.text)}${findCards(ev.candidates)}`
-    : `<span class="k">${esc(ev.kind.replace('_',' '))}</span>${esc(ev.text||'')}`;
-  row.innerHTML=`<div class="who">${esc(ev.actor)}</div><div class="body">${body}</div>`;
+  const row=el('div','ev '+ev.kind);
+  row.appendChild(el('div','who',ev.actor));
+  const body=el('div','body');
+  if(ev.kind==='candidates' && ev.candidates){
+    body.appendChild(el('span','k','finds'));
+    if(ev.text) body.appendChild(document.createTextNode(ev.text));
+    body.appendChild(buildCards(ev.candidates));
+  } else {
+    body.appendChild(el('span','k',ev.kind.replace('_',' ')));
+    if(ev.text) body.appendChild(document.createTextNode(ev.text));
+  }
+  row.appendChild(body);
   feed.appendChild(row); feed.scrollTop=feed.scrollHeight;
   const m=/Acquire (\w+):\s*'([^']+)'\s*@\s*€(\d+)/.exec(ev.text||'');
   if(m){const t=document.getElementById('tile-'+m[1]); if(t){t.classList.add('filled');
