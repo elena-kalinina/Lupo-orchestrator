@@ -1,0 +1,11 @@
+# Offline stub mode needs only the stdlib. These are for the real integrations.
+python-dotenv         # load .env (config toggles + keys)
+google-genai          # Gemini (stylist spec, extraction escalation, vision, TTS voice ping)
+httpx                 # Fastino Pioneer hosted GLiNER2 inference + finetune client
+curl_cffi             # Vinted web API with a Chrome TLS fingerprint (vinted_agent token-hack)
+fal-client            # fal.ai outfit preview image
+fastapi               # live canvas backend + web human panel
+uvicorn               # ASGI server for the canvas backend
+gliner                # OPTIONAL: local multilingual extraction (urchade/gliner_multi-v2.1); pulls torch
+twilio                # OPTIONAL: WhatsApp sandbox human channel
+pytest

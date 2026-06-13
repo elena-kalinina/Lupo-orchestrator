@@ -1,0 +1,28 @@
+[
+  {
+    "id": "a1",
+    "title": "Holographic sunglasses rave",
+    "desc": "occhiali da sole olografici, stile y2k",
+    "price": 6,
+    "size": "OS",
+    "brand": "NoName",
+    "seller_id": "t-s5",
+    "persona": "motivated",
+    "photo": "https://img/a1.jpg",
+    "url": "https://vinted/a1",
+    "country": "Italy"
+  },
+  {
+    "id": "a2",
+    "title": "Neon bum bag",
+    "desc": "sac banane fluo",
+    "price": 9,
+    "size": "OS",
+    "brand": "NoName",
+    "seller_id": "t-s6",
+    "persona": "flexible",
+    "photo": "https://img/a2.jpg",
+    "url": "https://vinted/a2",
+    "country": "France"
+  }
+]

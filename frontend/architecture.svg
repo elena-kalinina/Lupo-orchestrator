@@ -1,0 +1,70 @@
+<svg viewBox="0 0 1040 680" xmlns="http://www.w3.org/2000/svg" font-family="Inter, system-ui, sans-serif">
+  <defs>
+    <marker id="ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#948BA6"/>
+    </marker>
+  </defs>
+
+  <rect x="0" y="0" width="1040" height="680" rx="16" fill="#17151C"/>
+  <text x="40" y="44" fill="#ECE7F0" font-size="22" font-weight="600" font-family="Fraunces, serif">Lupo — a coordination layer for agents + humans</text>
+  <text x="40" y="66" fill="#948BA6" font-size="13">Same core. Swap the roster + tools, and a consumer shopping demo becomes industrial technical sales.</text>
+
+  <rect x="30" y="86" width="980" height="404" rx="14" fill="none" stroke="#534AB7" stroke-width="1.5" stroke-dasharray="6 5"/>
+  <text x="48" y="110" fill="#AFA9EC" font-size="12" letter-spacing="2">DOMAIN-AGNOSTIC CORE</text>
+
+  <rect x="60" y="150" width="190" height="92" rx="12" fill="#1F2A26" stroke="#86C7A6" stroke-width="1.5"/>
+  <text x="155" y="186" text-anchor="middle" fill="#ECE7F0" font-size="16" font-weight="600">Human (exec)</text>
+  <text x="155" y="208" text-anchor="middle" fill="#86C7A6" font-size="12.5">taste · approvals</text>
+  <rect x="60" y="252" width="190" height="30" rx="8" fill="#221F2A" stroke="#39333F"/>
+  <text x="155" y="271" text-anchor="middle" fill="#948BA6" font-size="12">voice · WhatsApp · web</text>
+
+  <rect x="398" y="142" width="250" height="118" rx="12" fill="#2A2030" stroke="#E0A3B4" stroke-width="2"/>
+  <text x="523" y="174" text-anchor="middle" fill="#ECE7F0" font-size="17" font-weight="600">Coordinator</text>
+  <text x="523" y="198" text-anchor="middle" fill="#E0A3B4" font-size="12.5">routing</text>
+  <text x="523" y="216" text-anchor="middle" fill="#E0A3B4" font-size="12.5">escalate-vs-proceed policy</text>
+  <text x="523" y="234" text-anchor="middle" fill="#E0A3B4" font-size="12.5">shared ledger · event stream</text>
+
+  <rect x="792" y="150" width="200" height="92" rx="12" fill="#1B2330" stroke="#8FB3E0" stroke-width="1.5"/>
+  <text x="892" y="180" text-anchor="middle" fill="#ECE7F0" font-size="16" font-weight="600">Agent roster</text>
+  <text x="892" y="200" text-anchor="middle" fill="#8FB3E0" font-size="12">(swappable)</text>
+  <text x="892" y="222" text-anchor="middle" fill="#948BA6" font-size="11.5">Stylist · Buyers · Procurement</text>
+  <text x="892" y="237" text-anchor="middle" fill="#948BA6" font-size="11.5">Negotiator · Sellers</text>
+
+  <rect x="360" y="298" width="326" height="138" rx="12" fill="#2A2415" stroke="#E8B15A" stroke-width="1.5"/>
+  <text x="377" y="320" fill="#E8B15A" font-size="12" letter-spacing="1.5">MODEL ARBITRATION</text>
+  <rect x="377" y="332" width="140" height="86" rx="10" fill="#221F2A" stroke="#39333F"/>
+  <text x="447" y="362" text-anchor="middle" fill="#ECE7F0" font-size="14" font-weight="600">GLiNER</text>
+  <text x="447" y="382" text-anchor="middle" fill="#948BA6" font-size="11">cheap · CPU</text>
+  <text x="447" y="398" text-anchor="middle" fill="#948BA6" font-size="11">multilingual</text>
+  <rect x="529" y="332" width="140" height="86" rx="10" fill="#221F2A" stroke="#39333F"/>
+  <text x="599" y="362" text-anchor="middle" fill="#ECE7F0" font-size="14" font-weight="600">Gemini</text>
+  <text x="599" y="382" text-anchor="middle" fill="#948BA6" font-size="11">frontier</text>
+  <text x="599" y="398" text-anchor="middle" fill="#948BA6" font-size="11">multimodal</text>
+  <line x1="517" y1="360" x2="529" y2="360" stroke="#948BA6" marker-end="url(#ar)"/>
+  <text x="523" y="352" text-anchor="middle" fill="#948BA6" font-size="9.5">escalate</text>
+  <line x1="529" y1="392" x2="517" y2="392" stroke="#948BA6" marker-end="url(#ar)"/>
+  <text x="523" y="412" text-anchor="middle" fill="#948BA6" font-size="9.5">train (Pioneer)</text>
+
+  <line x1="250" y1="196" x2="396" y2="196" stroke="#948BA6" marker-start="url(#ar)" marker-end="url(#ar)"/>
+  <text x="323" y="188" text-anchor="middle" fill="#948BA6" font-size="11">ask · approve · instruct</text>
+  <line x1="650" y1="196" x2="790" y2="196" stroke="#948BA6" marker-start="url(#ar)" marker-end="url(#ar)"/>
+  <text x="720" y="188" text-anchor="middle" fill="#948BA6" font-size="11">route · collect</text>
+  <line x1="523" y1="260" x2="523" y2="298" stroke="#948BA6" marker-start="url(#ar)" marker-end="url(#ar)"/>
+  <text x="595" y="282" text-anchor="middle" fill="#948BA6" font-size="11">extract · classify</text>
+
+  <text x="48" y="520" fill="#948BA6" font-size="12" letter-spacing="2">SWAPPABLE DOMAIN LAYER</text>
+  <rect x="120" y="532" width="340" height="96" rx="12" fill="#221F2A" stroke="#39333F"/>
+  <text x="290" y="562" text-anchor="middle" fill="#ECE7F0" font-size="15" font-weight="600">This demo · consumer</text>
+  <text x="290" y="586" text-anchor="middle" fill="#948BA6" font-size="12.5">Vinted search · outfit catalog</text>
+  <text x="290" y="604" text-anchor="middle" fill="#948BA6" font-size="12.5">2nd-hand sellers · €60–80 budget</text>
+  <rect x="580" y="532" width="340" height="96" rx="12" fill="#221F2A" stroke="#39333F"/>
+  <text x="750" y="562" text-anchor="middle" fill="#ECE7F0" font-size="15" font-weight="600">Swap → industrial</text>
+  <text x="750" y="586" text-anchor="middle" fill="#948BA6" font-size="12.5">RFQ / URS specs · product catalog</text>
+  <text x="750" y="604" text-anchor="middle" fill="#948BA6" font-size="12.5">buyers &amp; sellers · technical sales</text>
+  <line x1="460" y1="580" x2="580" y2="580" stroke="#948BA6" marker-start="url(#ar)" marker-end="url(#ar)"/>
+  <text x="520" y="572" text-anchor="middle" fill="#E8B15A" font-size="11">swap</text>
+  <line x1="523" y1="490" x2="523" y2="532" stroke="#948BA6" marker-start="url(#ar)" marker-end="url(#ar)"/>
+  <text x="523" y="514" text-anchor="middle" fill="#948BA6" font-size="11">tools</text>
+
+  <text x="1000" y="654" text-anchor="end" fill="#6E6680" font-size="11">the core never changes — only the roster and the domain layer do</text>
+</svg>

@@ -1,0 +1,28 @@
+[
+  {
+    "id": "bt1",
+    "title": "Buffalo platform chunky boots",
+    "desc": "Plateaustiefel, robust, Kunstleder, getragen",
+    "price": 40,
+    "size": "39",
+    "brand": "Buffalo",
+    "seller_id": "t-s7",
+    "persona": "firm",
+    "photo": "https://img/bt1.jpg",
+    "url": "https://vinted/bt1",
+    "country": "Germany"
+  },
+  {
+    "id": "bt2",
+    "title": "Black platform boots",
+    "desc": "zwarte plateau laarzen",
+    "price": 28,
+    "size": "39",
+    "brand": "NoName",
+    "seller_id": "t-s8",
+    "persona": "flexible",
+    "photo": "https://img/bt2.jpg",
+    "url": "https://vinted/bt2",
+    "country": "Netherlands"
+  }
+]

@@ -1,0 +1,248 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Lupo · Demo Walkthrough</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{--ink:#17151C;--surface:#221F2A;--line:#39333F;--text:#ECE7F0;--muted:#948BA6;--dim:#6E6680;
+    --rose:#E0A3B4;--amber:#E8B15A;--mint:#86C7A6;--blue:#8FB3E0}
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--ink);color:var(--text);font-family:Inter,system-ui,sans-serif;line-height:1.5}
+  .wrap{max-width:760px;margin:0 auto;padding:26px 20px 70px}
+  h1{font-family:Fraunces,serif;font-weight:600;font-size:26px;margin:0}
+  h1 small{font-family:Inter;font-weight:500;color:var(--muted);font-size:12px;display:block;letter-spacing:.14em;text-transform:uppercase;margin-bottom:6px}
+  .scn{display:flex;gap:8px;margin:16px 0 8px;flex-wrap:wrap}
+  .scn button{font-family:Inter;font-weight:500;font-size:13px;color:var(--text);background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:9px 14px;cursor:pointer}
+  .scn button.on{border-color:var(--rose);color:var(--rose);box-shadow:0 0 0 1px var(--rose)}
+  .brief{color:var(--muted);font-size:13.5px;margin:4px 0 14px}
+  .bar-wrap{background:var(--surface);border-radius:12px;padding:12px 14px;margin-bottom:12px}
+  .bar-top{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:6px;font-size:13px}
+  .track{height:8px;background:var(--ink);border-radius:6px;overflow:hidden}
+  .fill{height:100%;width:0;background:var(--mint);transition:width .5s}
+  .tray{display:grid;gap:8px;margin-bottom:14px}
+  .slot{border:1px dashed var(--line);border-radius:10px;padding:8px;min-height:54px;opacity:.5}
+  .slot.full{opacity:1;border-style:solid;border-color:var(--mint)}
+  .slot .c{font-size:10.5px;color:var(--dim);text-transform:uppercase;letter-spacing:.06em}
+  .slot .t{font-size:12px;font-weight:500;margin-top:2px}
+  .slot .p{font-size:12px;color:var(--mint)}
+  .ctrl{display:flex;gap:8px;align-items:center;margin-bottom:14px}
+  .ctrl button{font-family:Inter;font-weight:600;font-size:13px;color:var(--ink);background:var(--rose);border:0;border-radius:9px;padding:9px 15px;cursor:pointer}
+  .ctrl button.ghost{background:transparent;color:var(--text);border:1px solid var(--line)}
+  .prog{margin-left:auto;color:var(--dim);font-size:12px}
+  #log{display:flex;flex-direction:column;gap:8px}
+  .ev{background:var(--surface);border-radius:10px;padding:9px 12px;animation:in .3s ease}
+  @keyframes in{from{opacity:0;transform:translateY(5px)}to{opacity:1;transform:none}}
+  .ev .hd{display:flex;gap:8px;align-items:center;margin-bottom:4px}
+  .who{font-family:JetBrains Mono,monospace;font-size:11px;color:var(--dim)}
+  .k{font-size:10.5px;text-transform:uppercase;letter-spacing:.05em;color:var(--ink);border-radius:4px;padding:1px 7px}
+  .k.system,.k.stylist,.k.buyer,.k.negotiation{background:var(--muted)}
+  .k.escalation,.k.budget{background:var(--amber)}
+  .k.you{background:var(--blue)}.k.deal{background:var(--mint)}
+  .voice{margin-top:6px;font-size:13px;color:var(--muted)}
+  .voice .vt{color:var(--dim)}
+  .voice .vq{font-family:Fraunces,serif;font-style:italic;color:var(--text)}
+  .card{border:1px solid var(--line);border-radius:9px;padding:8px 10px;margin-top:6px}
+  .card.withimg{display:flex;gap:9px;align-items:flex-start}
+  .thumb{width:44px;height:58px;border-radius:6px;background:var(--ink);flex:none;overflow:hidden}
+  .thumb img{width:100%;height:100%;object-fit:cover}
+  .cbody{flex:1;min-width:0}
+  .card .r1{display:flex;justify-content:space-between;gap:8px}
+  .card .ti{font-weight:500}.card .pr{color:var(--muted)}
+  .card .d{color:var(--muted);font-size:12.5px;margin:3px 0}.card .d .lg{color:var(--dim)}
+  .tags{display:flex;gap:5px;flex-wrap:wrap}
+  .tag{font-size:10.5px;background:var(--ink);color:var(--muted);border-radius:5px;padding:1px 7px}
+  .tag.best{background:var(--mint);color:var(--ink)}.tag.warn{background:var(--amber);color:var(--ink)}
+  .nego{font-family:JetBrains Mono,monospace;font-size:13px;color:var(--muted)}.nego b{color:var(--mint);font-weight:500}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1><small>Lupo · coordination layer</small>Demo walkthrough</h1>
+  <div class="scn">
+    <button data-s="brunch" class="on">Brunch · €60 · negotiate</button>
+    <button data-s="tomorrowland">Tomorrowland · €80 · reallocate</button>
+    <button data-s="live">Live run ↻</button>
+  </div>
+  <div class="brief" id="brief"></div>
+  <div class="bar-wrap">
+    <div class="bar-top"><span style="color:var(--muted)">budget used</span><span><b id="used">€0</b> / <span id="cap">€60</span></span></div>
+    <div class="track"><div class="fill" id="fill"></div></div>
+  </div>
+  <div class="tray" id="tray"></div>
+  <div class="ctrl">
+    <button id="play">▶ play</button>
+    <button id="step" class="ghost">step</button>
+    <button id="reset" class="ghost">restart</button>
+    <span class="prog" id="prog"></span>
+  </div>
+  <div id="log"></div>
+</div>
+
+<script>
+var CAP=60;
+function card(o){
+  var t=o.t||o.title, p=(o.p!=null?o.p:o.price), sz=o.sz||o.size||'', d=o.d||o.desc||'';
+  var note=o.note||(o.source==='gemini-escalation'?'GLiNER unsure → Gemini':'');
+  var tags=(o.attrs||[]).map(function(a){return '<span class="tag">'+a+'</span>'}).join('');
+  if(note) tags+='<span class="tag warn">'+note+'</span>';
+  if(o.country) tags+='<span class="tag">'+o.country+'</span>';
+  if(o.best) tags+='<span class="tag best">best fit '+(o.fit||'')+'%</span>';
+  var img=o.photo?'<div class="thumb"><img src="'+o.photo+'" alt="" onerror="this.style.display=\'none\'"></div>':'';
+  return '<div class="card'+(o.photo?' withimg':'')+'">'+img+'<div class="cbody"><div class="r1"><span class="ti">'+t+'</span><span class="pr">€'+p+' · '+sz+'</span></div><div class="d">“'+d+'” <span class="lg">['+o.lang+']</span></div><div class="tags">'+tags+'</div></div></div>';
+}
+function search(cat,items,pick){
+  return '<div style="font-weight:500;margin-bottom:2px">running '+cat+' search…</div>'+items.map(card).join('')+'<div style="margin-top:6px">Pick: <b>'+pick+'</b></div>';
+}
+
+var SCEN={
+ brunch:{cap:60, slots:["dress","shoes","bag","jewellery"],
+  brief:"“Sunday brunch with the girls — cute but comfy.” The org styles it, you keep the taste calls, the budget split is confirmed, and a standout dress over budget gets negotiated down.",
+  steps:[
+  {k:"system",a:"coordinator",h:"Mission — brunch, cute but comfy. Budget €60."},
+  {k:"stylist",a:"stylist",h:"Vision — cream/sage/gold. Dress (floral midi), sandals, raffia tote, gold hoops."},
+  {k:"escalation",a:"coordinator",h:"Approve the vision?",vt:"hyped, Russian",v:"Tovarisch! Approve the look — or shall we remix?"},
+  {k:"you",a:"you",h:"Ballet flats instead of sandals, and a small shoulder bag."},
+  {k:"stylist",a:"stylist",h:"Spec updated — shoes → ballet flats; bag → small shoulder bag."},
+  {k:"budget",a:"procurement",h:"Proposed split — dress €24 · shoes €17 · bag €12 · jewellery €7."},
+  {k:"escalation",a:"coordinator",h:"Approve this budget split?",vt:"dry, German",v:"Kurz und schmerzlos: passt die Aufteilung?"},
+  {k:"you",a:"you",h:"Approve."},
+  {k:"system",a:"coordinator",h:"Running searches in parallel: dress · shoes · bag · jewellery."},
+  {k:"buyer",a:"buyer",raw:search("dress",[
+    {t:"Zara floral midi casual dress",p:32,sz:"M",lang:"fr",country:"France",d:"Robe midi fleurie en coton, style bohème, taille normale",attrs:["cotton","boho","true-to-size"],best:1,fit:94},
+    {t:"H&M cream sundress",p:18,sz:"M",lang:"nl",country:"Netherlands",d:"Lichte zomerjurk, katoen, valt klein",attrs:["cotton","fits-small"]},
+    {t:"Mango midi floral",p:24,sz:"S",lang:"it",country:"Italy",d:"vestito midi a fiori, nuovo con cartellino",attrs:[],source:"gemini-escalation"}
+  ],"Zara floral midi — €32")},
+  {k:"escalation",a:"coordinator",h:"Dress is €32 — €8 over its €24 budget. Raiding other categories risks the look. Negotiate, or stretch?",vt:"wry, English",v:"Tiny snag — the dress is over budget. Haggle, or stretch?"},
+  {k:"you",a:"you",h:"Negotiate."},
+  {k:"negotiation",a:"negotiator ↔ seller",raw:'<div class="nego">open €24 → seller counter €29 → raise €26 → <b>deal €26 (saved €6)</b></div>',ops:{used:26,fill:{s:"dress",t:"Zara floral midi",p:26}}},
+  {k:"buyer",a:"buyer",raw:search("shoes",[
+    {t:"Tan ballet flats leather",p:14,sz:"38",lang:"fr",country:"France",d:"Ballerines en cuir véritable, taille normale",attrs:["leather","true-to-size"],best:1,fit:94},
+    {t:"Beige ballet flats",p:12,sz:"38",lang:"nl",country:"Netherlands",d:"leren ballerina's, valt groot",attrs:["leather","fits-large"]}
+  ],"Tan ballet flats — €14"),ops:{used:40,fill:{s:"shoes",t:"Tan ballet flats",p:14}}},
+  {k:"buyer",a:"buyer",raw:search("bag",[
+    {t:"Mini summer shoulder bag",p:10,sz:"OS",lang:"fr",country:"France",d:"petit sac d'été en raphia, style bohème",attrs:["boho"],best:1,fit:76},
+    {t:"Small cream shoulder bag",p:13,sz:"OS",lang:"nl",country:"Netherlands",d:"kleine schoudertas, leer, nieuwstaat",attrs:["leather"]}
+  ],"Mini shoulder bag — €10"),ops:{used:50,fill:{s:"bag",t:"Mini shoulder bag",p:10}}},
+  {k:"buyer",a:"buyer",raw:search("jewellery",[
+    {t:"Gold dainty hoops earrings",p:8,sz:"OS",lang:"fr",country:"France",d:"créoles dorées délicates, neuves",attrs:["gold","hoops"],best:1,fit:94},
+    {t:"Gold hoop earrings small",p:6,sz:"OS",lang:"nl",country:"Netherlands",d:"kleine gouden oorringen",attrs:["gold","hoops"]}
+  ],"Gold dainty hoops — €8")+'<div style="margin-top:6px"><span class="tag warn">procurement: €1 over absorbed from slack</span></div>',ops:{used:58,fill:{s:"jewellery",t:"Gold dainty hoops",p:8}}},
+  {k:"deal",a:"coordinator",h:"Outfit complete — 4/4 items, €58 / €60. €6 saved by negotiating."},
+  {k:"system",a:"coordinator",h:"Finds came from 4 sellers in 3 countries — so handover is per item, not one pickup."},
+  {k:"escalation",a:"coordinator",h:"Confirm purchase — €58 across the four sellers?",vt:"deadpan, Russian",v:"Vsyo gotovo. Pokupaem, da?"},
+  {k:"you",a:"you",h:"Confirm."},
+  {k:"deal",a:"coordinator",h:"Purchase confirmed.",vt:"theatrical, German",v:"Achtung — alles wird verschickt! Dress, shoes, bag and hoops ship from France & the Netherlands, paid online, tracking to follow. Nothing to pick up."}
+ ]},
+ tomorrowland:{cap:80, slots:["top","bottoms","accessories","boots"],
+  brief:"“Tomorrowland mainstage, Saturday night — bold, rave-ready, danceable.” The hero platform boots blow their slice, and on ‘stretch’ procurement REALLOCATES budget from the other categories instead of overspending.",
+  steps:[
+  {k:"system",a:"coordinator",h:"Mission — Tomorrowland mainstage, rave-ready. Budget €80."},
+  {k:"stylist",a:"stylist",h:"Vision — neon/black/holographic. Crop top, cargo techno pants, holographic sunglasses, platform boots."},
+  {k:"escalation",a:"coordinator",h:"Approve the vision?",vt:"hyped, Russian",v:"Ogon! Approve — or remix the rave fit?"},
+  {k:"you",a:"you",h:"Make it a mesh top and add some sparkle."},
+  {k:"stylist",a:"stylist",h:"Spec updated — top → mesh + sparkle."},
+  {k:"budget",a:"procurement",h:"Proposed split — top €20 · bottoms €24 · accessories €12 · boots €24."},
+  {k:"escalation",a:"coordinator",h:"Approve this budget split?",vt:"dry, German",v:"Aufteilung ok? Sag ja."},
+  {k:"you",a:"you",h:"Approve."},
+  {k:"system",a:"coordinator",h:"Running searches: top · bottoms · accessories · boots (hero last)."},
+  {k:"buyer",a:"buyer",raw:search("top",[
+    {t:"Mesh sparkle crop top",p:15,sz:"S",lang:"fr",country:"France",d:"haut résille à paillettes, style rave",attrs:["mesh","sparkle"],best:1,fit:76},
+    {t:"Black mesh top",p:11,sz:"M",lang:"nl",country:"Netherlands",d:"zwart mesh topje, festival",attrs:["mesh"]}
+  ],"Mesh sparkle crop top — €15"),ops:{used:15,fill:{s:"top",t:"Mesh sparkle top",p:15}}},
+  {k:"buyer",a:"buyer",raw:search("bottoms",[
+    {t:"Cargo techno pants black",p:18,sz:"M",lang:"nl",country:"Netherlands",d:"cargo broek, techno stijl",attrs:["cargo","techno"],best:1,fit:76},
+    {t:"Black cargo shorts",p:14,sz:"S",lang:"fr",country:"France",d:"short cargo noir",attrs:["cargo"]}
+  ],"Cargo techno pants — €18"),ops:{used:33,fill:{s:"bottoms",t:"Cargo techno pants",p:18}}},
+  {k:"buyer",a:"buyer",raw:search("accessories",[
+    {t:"Holographic sunglasses rave",p:6,sz:"OS",lang:"it",country:"Italy",d:"occhiali da sole olografici, stile y2k",attrs:["holographic","y2k"],best:1,fit:76},
+    {t:"Neon bum bag",p:9,sz:"OS",lang:"fr",country:"France",d:"sac banane fluo",attrs:[]}
+  ],"Holographic sunglasses — €6"),ops:{used:39,fill:{s:"accessories",t:"Holographic shades",p:6}}},
+  {k:"buyer",a:"buyer",raw:search("boots",[
+    {t:"Buffalo platform chunky boots",p:40,sz:"39",lang:"de",country:"Germany",d:"Plateaustiefel, robust, Kunstleder",attrs:["platform","chunky"],best:1,fit:88},
+    {t:"Black platform boots",p:28,sz:"39",lang:"nl",country:"Netherlands",d:"zwarte plateau laarzen",attrs:["platform"]}
+  ],"Buffalo platform chunky boots — €40")},
+  {k:"escalation",a:"coordinator",h:"Boots are €40 — €16 over their €24 budget, and they're the hero of the look. Negotiate, or stretch?",vt:"hyped, German",v:"Die Boots sind der Star — strecken wir das Budget?"},
+  {k:"you",a:"you",h:"Stretch."},
+  {k:"budget",a:"procurement",raw:'<div class="nego">slack: top €5 + bottoms €6 + accessories €6 = €17  →  <b>reallocated €16 → boots</b> (total stays €80)</div>',ops:{used:79,fill:{s:"boots",t:"Buffalo platform boots",p:40}}},
+  {k:"deal",a:"coordinator",h:"Outfit complete — 4/4 items, €79 / €80. Budget rebalanced, not overspent."},
+  {k:"system",a:"coordinator",h:"Finds came from 4 sellers in 4 countries — handover is per item."},
+  {k:"escalation",a:"coordinator",h:"Confirm purchase — €79 across the four sellers?",vt:"deadpan, Russian",v:"Poehali — pokupaem?"},
+  {k:"you",a:"you",h:"Confirm."},
+  {k:"deal",a:"coordinator",h:"Purchase confirmed.",vt:"breezy, English",v:"Top, bottoms and shades ship from France, the Netherlands and Italy — paid online. The boots seller is local in Munich: for those, U3/U6 to Universität, bring €40 cash, message drafted. Everything else ships."}
+ ]}
+};
+
+var log=document.getElementById("log"),prog=document.getElementById("prog"),tray=document.getElementById("tray");
+var cur="brunch",i=0,timer=null;
+
+function buildTray(){
+  tray.innerHTML="";
+  var slots=SCEN[cur].slots||[];
+  tray.style.gridTemplateColumns="repeat("+Math.max(1,Math.min(4,slots.length||4))+",1fr)";
+  slots.forEach(function(s){
+    var d=document.createElement("div");d.className="slot";d.id="slot-"+s;
+    d.innerHTML='<div class="c">'+s+'</div><div class="t" style="color:var(--muted)">—</div><div class="p"></div>';
+    tray.appendChild(d);
+  });
+}
+function applyOps(o){
+  if(!o)return;
+  if(o.used!=null){document.getElementById("used").textContent="€"+o.used;document.getElementById("fill").style.width=Math.round(o.used/SCEN[cur].cap*100)+"%";}
+  if(o.fill){var s=document.getElementById("slot-"+o.fill.s);
+    if(!s){s=document.createElement("div");s.id="slot-"+o.fill.s;tray.appendChild(s);}
+    s.className="slot full";
+    s.innerHTML='<div class="c">'+o.fill.s+'</div><div class="t">'+o.fill.t+'</div><div class="p">€'+o.fill.p+'</div>';}
+}
+function render(s){
+  var row=document.createElement("div");row.className="ev";
+  var voice=s.v?'<div class="voice"><span class="vt">voice ['+(s.vt||'')+'] → shown as text:</span> <span class="vq">“'+s.v+'”</span></div>':'';
+  row.innerHTML='<div class="hd"><span class="k '+s.k+'">'+s.k+'</span><span class="who">'+s.a+'</span></div><div>'+(s.raw||s.h||"")+'</div>'+voice;
+  log.appendChild(row);applyOps(s.ops);
+}
+function next(){var st=SCEN[cur].steps;if(i>=st.length){stop();return;}render(st[i]);i++;prog.textContent="step "+i+" / "+st.length;}
+function stop(){clearInterval(timer);timer=null;document.getElementById("play").textContent="▶ play";}
+function play(){if(timer){stop();return;}document.getElementById("play").textContent="⏸ pause";timer=setInterval(function(){var st=SCEN[cur].steps;if(i>=st.length)stop();else next();},1300);}
+function reset(){stop();i=0;log.innerHTML="";
+  document.getElementById("brief").textContent=SCEN[cur].brief;
+  document.getElementById("cap").textContent="€"+SCEN[cur].cap;
+  document.getElementById("used").textContent="€0";document.getElementById("fill").style.width="0%";
+  buildTray();prog.textContent="step 0 / "+SCEN[cur].steps.length;}
+
+function mapKind(k,a){return ({human_reply:"you",escalation:"escalation",budget:"budget",deal:"deal",negotiation:"negotiation",candidates:"buyer",task:"system",decision:"deal",message:(a==="stylist"?"stylist":"buyer")})[k]||"system";}
+function liveStep(ev){
+  var s={k:mapKind(ev.kind,ev.actor),a:ev.actor};
+  if(ev.kind==="candidates"&&ev.candidates){s.raw='<div style="font-weight:500;margin-bottom:2px">running '+(ev.category||"")+' search…</div>'+ev.candidates.map(card).join('');}
+  else s.h=ev.text||"";
+  var m=/Acquire (\w+):\s*'([^']+)'\s*@\s*€(\d+)\s*\|\s*remaining €(\d+)/.exec(ev.text||"");
+  if(m)s.ops={used:CAP-parseInt(m[4]),fill:{s:m[1],t:m[2],p:m[3]}};
+  var o=/Outfit:[^€]*€(\d+)/.exec(ev.text||"");if(o)s.ops={used:parseInt(o[1])};
+  return s;
+}
+function loadLive(){
+  fetch("../data/events.jsonl").then(function(r){return r.ok?r.text():Promise.reject();}).then(function(t){
+    var evs=t.trim().split("\n").map(JSON.parse);
+    var capM;evs.forEach(function(e){var x=/within €(\d+)/.exec(e.text||"");if(x)capM=parseInt(x[1]);});
+    CAP=capM||60;
+    var slots=[];evs.forEach(function(e){var m=/Acquire (\w+):/.exec(e.text||"");if(m&&slots.indexOf(m[1])<0)slots.push(m[1]);});
+    SCEN.live={cap:CAP,slots:slots,brief:"Live replay of the last real run (data/events.jsonl) — "+evs.length+" events.",steps:evs.map(liveStep)};
+    cur="live";reset();
+  }).catch(function(){
+    SCEN.live={cap:60,slots:[],brief:"No data/events.jsonl found. Run scripts/run_mission.py, then serve this folder (python3 -m http.server) and reopen.",steps:[{k:"system",a:"coordinator",h:"No live run found — showing nothing. See the note above."}]};
+    cur="live";reset();
+  });
+}
+
+document.getElementById("play").onclick=play;
+document.getElementById("step").onclick=function(){stop();next();};
+document.getElementById("reset").onclick=reset;
+document.querySelectorAll(".scn button").forEach(function(b){
+  b.onclick=function(){document.querySelectorAll(".scn button").forEach(function(x){x.classList.remove("on")});b.classList.add("on");
+    if(b.dataset.s==="live"){loadLive();}else{cur=b.dataset.s;reset();}};
+});
+reset();
+</script>
+</body>
+</html>

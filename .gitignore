@@ -1,0 +1,21 @@
+# Secrets
+.env
+
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+.pytest_cache/
+
+# Generated demo artifacts
+*.wav
+lupo_ping*.wav
+data/previews/
+frontend/previews/
+
+# OS / editor
+.DS_Store
+.idea/
+.vscode/

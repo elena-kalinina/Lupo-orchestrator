@@ -1,0 +1,28 @@
+[
+  {
+    "id": "j1",
+    "title": "Gold dainty hoops earrings",
+    "desc": "créoles dorées délicates, neuves",
+    "price": 8,
+    "size": "OS",
+    "brand": "&OtherStories",
+    "seller_id": "s10",
+    "persona": "flexible",
+    "photo": "https://img/j1.jpg",
+    "url": "https://vinted/j1",
+    "country": "France"
+  },
+  {
+    "id": "j2",
+    "title": "Gold hoop earrings small",
+    "desc": "kleine gouden oorringen",
+    "price": 6,
+    "size": "OS",
+    "brand": "Mango",
+    "seller_id": "s11",
+    "persona": "motivated",
+    "photo": "https://img/j2.jpg",
+    "url": "https://vinted/j2",
+    "country": "Netherlands"
+  }
+]

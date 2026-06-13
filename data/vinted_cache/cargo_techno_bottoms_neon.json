@@ -1,0 +1,28 @@
+[
+  {
+    "id": "bo1",
+    "title": "Cargo techno pants black",
+    "desc": "cargo broek, techno stijl, polyester",
+    "price": 18,
+    "size": "M",
+    "brand": "Bershka",
+    "seller_id": "t-s3",
+    "persona": "flexible",
+    "photo": "https://img/bo1.jpg",
+    "url": "https://vinted/bo1",
+    "country": "Netherlands"
+  },
+  {
+    "id": "bo2",
+    "title": "Black cargo shorts",
+    "desc": "short cargo noir",
+    "price": 14,
+    "size": "S",
+    "brand": "Pull&Bear",
+    "seller_id": "t-s4",
+    "persona": "motivated",
+    "photo": "https://img/bo2.jpg",
+    "url": "https://vinted/bo2",
+    "country": "France"
+  }
+]
