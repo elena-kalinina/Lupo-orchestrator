@@ -258,8 +258,11 @@ def cmd_narrate(args):
     touched = 0
     for name, tags in scn["components"]:
         cache_query = _query_for(name, tags, scn["palette0"])
-        path = vinted.CACHE_DIR / f"{vinted._slug(cache_query)}.json"
-        if not path.exists():
+        cache_dir = vinted.CACHE_DIR.resolve()
+        path = (cache_dir / f"{vinted._slug(cache_query)}.json").resolve()
+        # _slug() already strips to [a-z0-9_]; this guard makes the containment explicit
+        # so the path can never escape the cache dir regardless of the query string.
+        if cache_dir not in path.parents or not path.exists():
             continue
         items = json.loads(path.read_text(encoding="utf-8"))
         if name == hero_name:
