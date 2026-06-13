@@ -1,0 +1,7 @@
+
+== poll ==
+  status=running (0s)
+  status=complete (53s)
+  done — metrics: {'final_training_loss': 12.932996, 'final_validation_loss': 37.225644, 'best_validation_loss': 37.225644}
+
+Done.

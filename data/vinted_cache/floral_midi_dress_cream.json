@@ -1,41 +1,30 @@
 [
   {
-    "id": "d1",
-    "title": "Zara floral midi casual dress",
-    "desc": "Robe midi fleurie en coton, style bohème, portée une fois, taille normale",
-    "price": 32,
-    "size": "M",
-    "brand": "Zara",
-    "seller_id": "s1",
-    "persona": "flexible",
-    "photo": "https://img/d1.jpg",
-    "url": "https://vinted/d1",
-    "country": "France"
-  },
-  {
-    "id": "d2",
-    "title": "H&M cream sundress",
-    "desc": "Lichte zomerjurk, katoen, valt klein",
-    "price": 18,
-    "size": "M",
-    "brand": "H&M",
-    "seller_id": "s2",
-    "persona": "firm",
-    "photo": "https://img/d2.jpg",
-    "url": "https://vinted/d2",
-    "country": "Netherlands"
-  },
-  {
-    "id": "d3",
-    "title": "Mango midi floral",
-    "desc": "vestito midi a fiori, nuovo con cartellino",
-    "price": 24,
-    "size": "S",
+    "id": "9115159938",
+    "title": "Mango - Clean girl beige summer dress",
+    "desc": "Mango - Clean girl beige summer dress",
+    "price": 15.0,
+    "size": "M / 38 / 10",
     "brand": "Mango",
-    "seller_id": "s3",
-    "persona": "motivated",
-    "photo": "https://img/d3.jpg",
-    "url": "https://vinted/d3",
-    "country": "Italy"
+    "seller_id": "193848979",
+    "photo": "https://images1.vinted.net/t/01_01824_WK4eLk49V5pjmLzfSNT8Abez/f800/1780853658.jpeg?s=30003276216c8a50d4ff2e797c1e514ed65a1ab7",
+    "country": "France",
+    "url": "https://www.vinted.fr/items/9115159938-mango-clean-girl-beige-summer-dress",
+    "persona": "motivated"
+  },
+  {
+    "id": "1893724036",
+    "title": "sand dress with belt",
+    "desc": "sand dress with belt",
+    "price": 15.0,
+    "size": "M / 38 / 10",
+    "brand": "Uniqlo",
+    "seller_id": "62017124",
+    "photo": "https://images1.vinted.net/t/03_01943_Qe24PhUdyCotpbjbhwuvCBiJ/f800/1779716594.jpeg?s=08819c6761cbbca59f53d7450eb7b0fa95a734df",
+    "country": "Pays-Bas",
+    "url": "https://www.vinted.fr/items/1893724036-sand-dress-with-belt",
+    "country_code": "NL",
+    "city": "Amsterdam",
+    "persona": "motivated"
   }
 ]

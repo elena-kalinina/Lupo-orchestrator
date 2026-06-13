@@ -25,6 +25,7 @@ class Ledger:
     palette: list = field(default_factory=list)
     components: list = field(default_factory=list)   # list[Component]
     human_queue: list = field(default_factory=list)  # pending questions
+    allocations: dict = field(default_factory=dict)  # optional explicit per-component sub-budgets
 
     def spent(self):
         return sum(c.final_price or 0 for c in self.components if c.status == "acquired")

@@ -5,8 +5,11 @@ shared ledger, runs the escalate-vs-proceed policy to decide when to act vs. ask
 human, arbitrates budget conflicts, and sequences negotiation. This is the layer the
 challenge calls 'the hard part technically, and where the value is'.
 """
+import os
+
 from . import policy
 from . import lookbook
+from . import checkout
 from .ledger import Ledger
 
 
@@ -20,13 +23,14 @@ class Coordinator:
         self.negotiator = negotiator
         self.seller_factory = seller_factory  # (listing) -> Seller
 
-    def run(self, brief, budget, palette_hint=None):
+    def run(self, brief, budget, palette_hint=None, allocations=None):
         ev = self.events
         ev.emit("task", "coordinator", text=f"Mission: '{brief}' within €{budget:.0f}")
 
         # 1) Stylist proposes the vision; ASK the human to approve (taste = human's call).
         palette, components = self.stylist.propose_spec(brief, budget)
-        ledger = Ledger(brief=brief, total_budget=budget, palette=palette, components=components)
+        ledger = Ledger(brief=brief, total_budget=budget, palette=palette,
+                        components=components, allocations=allocations or {})
         self._preview(palette, components, "Proposed outfit")
 
         decision, why = policy.decide("approve_spec", taste_risk=True)
@@ -125,6 +129,24 @@ class Coordinator:
                      f"total €{ledger.spent():.0f} / €{ledger.total_budget:.0f}")
 
         # Final purchase = side-effectful -> CONFIRM with the human.
+        # Lupo never auto-buys. We surface the REAL listing links on the canvas (clickable
+        # in the same browser as the demo — always works) AND best-effort open them as
+        # native browser tabs when LUPO_OPEN_LISTINGS=1 and a desktop browser is available
+        # (i.e. when the server runs in your own terminal, not headless/remote).
+        items = [c.chosen for c in acquired]
+        links = [{"title": it.get("title", ""), "url": it.get("url", "")}
+                 for it in items if str(it.get("url", "")).startswith("http")]
+        opened = checkout.open_listings(items)
+        if links:
+            ev.emit("links", "coordinator", links=links,
+                    text="Here are the exact listings — open each one to review and check out "
+                         "yourself (I never spend money for you):")
+            self.human.instruct(f"I lined up {len(links)} listing(s) for you to review and buy — "
+                                 f"the links are on the canvas.")
+        if opened:
+            ev.emit("message", "coordinator",
+                    text=f"(Also popped {len(opened)} listing(s) open in your browser.)")
+
         d, why = policy.decide("purchase")
         ev.emit("escalation", "coordinator", text=f"CONFIRM purchase ({why})")
         reply = self.human.ask(f"Buy all {len(acquired)} items for €{ledger.spent():.0f}?",
@@ -134,7 +156,17 @@ class Coordinator:
             ev.emit("deal", "coordinator", text="Purchase confirmed")
             self._logistics(ledger, acquired)
 
-    HOME = "Germany"  # the wearer's country (Munich). Local items = in-person pickup.
+    # The wearer's home. Items from this country become in-person pickups; everything
+    # else ships. Defaults to Belgium because that's where our real demo finds' local
+    # seller is — override with LUPO_HOME_COUNTRY / LUPO_HOME_CODE / LUPO_HOME_CITY.
+    # We match on the ISO code (HOME_CODE) because Vinted localises country_title
+    # ("Belgique"/"Allemagne"), with a name fallback for assigned/non-live items.
+    HOME = os.getenv("LUPO_HOME_COUNTRY", "Belgique")
+    HOME_CODE = os.getenv("LUPO_HOME_CODE", "BE")
+    HOME_CITY = os.getenv("LUPO_HOME_CITY", "Berchem")
+
+    def _is_home(self, item):
+        return (item.get("country_code") == self.HOME_CODE) or (item.get("country") == self.HOME)
 
     def _logistics(self, ledger, acquired):
         """The finds come from different sellers in different countries. Most ship
@@ -142,7 +174,7 @@ class Coordinator:
         for that one item's price, not the whole basket. Emitted to the stream AND
         delivered over the human channel."""
         ev = self.events
-        local = [c for c in acquired if (c.chosen.get("country") == self.HOME)]
+        local = [c for c in acquired if self._is_home(c.chosen)]
         ship = [c for c in acquired if c not in local]
 
         if ship:
@@ -156,9 +188,17 @@ class Coordinator:
             self.human.instruct(msg)
 
         for c in local:
-            msg = (f"The {c.name} seller is local in Munich. For that one: U3/U6 to "
-                   f"Universität, bring €{c.final_price:.0f} cash from the Rewe ATM on "
-                   f"Leopoldstraße, and tap to send the pickup message I drafted. "
+            city = c.chosen.get("city") or self.HOME_CITY
+            # Keep the concrete Munich transit detail when it's actually Munich;
+            # otherwise a clean, location-correct pickup line.
+            if city == "Munich":
+                how = ("U3/U6 to Universität, bring €%.0f cash from the Rewe ATM on "
+                       "Leopoldstraße, and tap to send the pickup message I drafted."
+                       % c.final_price)
+            else:
+                how = ("bring €%.0f cash and tap to send the pickup message I drafted."
+                       % c.final_price)
+            msg = (f"The {c.name} seller is local in {city}. For that one: {how} "
                    f"(Everything else ships.)")
             ev.emit("message", "coordinator", text=msg)
             self.human.instruct(msg)

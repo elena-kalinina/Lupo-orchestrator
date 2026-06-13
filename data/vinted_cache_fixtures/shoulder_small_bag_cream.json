@@ -1,0 +1,28 @@
+[
+  {
+    "id": "b2",
+    "title": "Small cream shoulder bag",
+    "desc": "kleine schoudertas, leer, nieuwstaat",
+    "price": 13,
+    "size": "OS",
+    "brand": "Zara",
+    "seller_id": "s8",
+    "persona": "flexible",
+    "photo": "https://img/b2.jpg",
+    "url": "https://vinted/b2",
+    "country": "Netherlands"
+  },
+  {
+    "id": "b3",
+    "title": "Mini summer shoulder bag",
+    "desc": "petit sac d'été en raphia, style bohème",
+    "price": 10,
+    "size": "OS",
+    "brand": "H&M",
+    "seller_id": "s9",
+    "persona": "motivated",
+    "photo": "https://img/b3.jpg",
+    "url": "https://vinted/b3",
+    "country": "France"
+  }
+]

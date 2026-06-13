@@ -30,31 +30,34 @@ idea — the core never changes."
 ## Part 2 — Live demo (~50s)
 **[do: switch to the canvas; press Play; let the feed breathe on each escalation]**
 
-"Now watch it run. The brief: a Tomorrowland outfit, eighty euros.
+"Now watch it run. The brief: a Tomorrowland outfit, twenty euros.
 
 The stylist proposes a look and pings me — and I tweak it: mesh top, a bit more sparkle.
 
 Then procurement proposes how to split the budget across the four pieces — and this is
 a deliberate checkpoint: I approve that split *before* anything gets bought.
 
-Now the buyers search Vinted in parallel. These listings are real — French, Dutch,
-Italian, German — and the small model pulls structured attributes out of that messy
-text. **[do: point to a 'GLiNER unsure → Gemini' tag]** When it isn't confident, watch
-— it escalates that one listing up to Gemini.
+Now the buyers search Vinted in parallel. These listings are real — French, German,
+Dutch, Belgian — and the small model pulls structured attributes out of that messy
+multilingual text. **[do: point to a 'GLiNER unsure → Gemini' tag]** When it isn't
+confident — and on day-one listings it often isn't — it escalates that one up to Gemini,
+and every correction becomes a labelled training row for the small model. We ran that
+fine-tune for real: it lifted the small model's F1 by about forty percent.
 
 And here's the moment that matters. **[do: pause on the boots escalation]** The platform
-boots are the hero of the look, but they're sixteen euros over their slice. The
-Coordinator doesn't just overspend — it asks me: negotiate, or stretch? I say stretch —
-and procurement *reallocates* sixteen euros of slack from the other categories. Total
-stays under eighty. Nothing overspent.
+boots are the hero of the look — so Lupo sources them first, and they come in four euros
+over their slice. The Coordinator doesn't just overspend — it asks me: negotiate, or
+stretch? I say stretch — and procurement *reallocates* four euros from the other,
+still-unspent categories, trimming each a little. Total stays at twenty. Nothing overspent.
 
 And the finish is honest: the four finds come from four sellers in four countries — so
-three of them ship, paid online, and only the local Munich pair becomes an in-person
-pickup, with the tram and the exact cash for that one item."
+three of them ship, paid online, and only the local one — the boots, from a seller here
+in Berchem — becomes an in-person pickup: ten euros, cash, with a tap to send the message
+I drafted."
 
 > *Negotiate variant (brunch run):* "…it asks me: negotiate, or stretch? I say negotiate —
-> and the negotiator agent haggles the seller down from thirty-two euros to twenty-six,
-> live. Six euros saved, and the outfit lands under budget."
+> and the negotiator agent haggles the seller down from fifteen euros to twelve, live.
+> Three euros saved, and the whole outfit lands at twenty-nine of thirty."
 
 ## Part 3 — The close (~13s)
 **[do: back to the diagram; let the 'consumer → industrial' swap arrow show]**

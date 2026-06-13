@@ -71,16 +71,36 @@ _run_lock = threading.Lock()
 _running = False
 
 
+AUDIO_CACHE = AUDIO_DIR / "cache"
+AUDIO_CACHE.mkdir(parents=True, exist_ok=True)
+
+
 def _speak(text):
-    """Best-effort Gemini TTS -> a WAV under frontend/audio. Returns a /static URL or None."""
+    """Gemini TTS -> a WAV under frontend/audio, returned as a /static URL (or None).
+
+    Pings are CACHED by their exact text: the two demo scenarios are deterministic, so
+    every prompt/instruct string is identical run-to-run. The first time we voice a line
+    we render it with Gemini TTS and keep the WAV; every later run (and every later prompt
+    with the same text) replays the cached file instantly. This makes the live demo immune
+    to the preview-TTS per-minute quota (429 RESOURCE_EXHAUSTED) — pre-warm once with
+    `python scripts/prewarm_tts.py` and the voice always plays. Pre-rendered, still real
+    Gemini audio."""
     if not config.USE_REAL_VOICE:
         return None
+    import hashlib
+    import os as _os
+    sig = f"{_os.getenv('GEMINI_TTS_MODEL', '')}|{_os.getenv('GEMINI_TTS_VOICE', '')}|{text}"
+    key = hashlib.sha1(sig.encode("utf-8")).hexdigest()[:16]
+    cached = AUDIO_CACHE / f"{key}.wav"
+    if cached.exists() and cached.stat().st_size > 0:
+        return f"/static/audio/cache/{key}.wav"
     try:
         from . import llm
-        name = f"ping_{uuid.uuid4().hex[:8]}.wav"
-        llm.gemini_tts(text, out_path=str(AUDIO_DIR / name))
-        return f"/static/audio/{name}"
+        llm.gemini_tts(text, out_path=str(cached))
+        return f"/static/audio/cache/{key}.wav"
     except Exception:
+        if cached.exists():
+            cached.unlink(missing_ok=True)   # don't leave a 0-byte file that masks a real one later
         return None
 
 

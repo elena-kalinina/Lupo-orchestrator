@@ -1,28 +1,17 @@
 [
   {
-    "id": "b2",
-    "title": "Small cream shoulder bag",
-    "desc": "kleine schoudertas, leer, nieuwstaat",
-    "price": 13,
-    "size": "OS",
-    "brand": "Zara",
-    "seller_id": "s8",
+    "id": "7474539825",
+    "title": "Black small MANGO shoulder bag",
+    "desc": "Black small MANGO shoulder bag",
+    "price": 5.0,
+    "size": "",
+    "brand": "Mango",
+    "seller_id": "164976545",
+    "photo": "https://images1.vinted.net/t/04_00d06_VhMevS3hzSwY99i1GW2sJthV/f800/1762199799.jpeg?s=d877fc6cc2862698d80f2d6d101b344b1dae1792",
+    "country": "Pays-Bas",
+    "url": "https://www.vinted.fr/items/7474539825-black-small-mango-shoulder-bag",
     "persona": "flexible",
-    "photo": "https://img/b2.jpg",
-    "url": "https://vinted/b2",
-    "country": "Netherlands"
-  },
-  {
-    "id": "b3",
-    "title": "Mini summer shoulder bag",
-    "desc": "petit sac d'été en raphia, style bohème",
-    "price": 10,
-    "size": "OS",
-    "brand": "H&M",
-    "seller_id": "s9",
-    "persona": "motivated",
-    "photo": "https://img/b3.jpg",
-    "url": "https://vinted/b3",
-    "country": "France"
+    "country_code": "NL",
+    "city": "Eindhoven"
   }
 ]

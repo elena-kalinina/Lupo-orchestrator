@@ -205,12 +205,42 @@ def poll(client, job_id, timeout_s=1800):
     raise TimeoutError("training did not complete in time")
 
 
-def evaluate(client, job_id, dataset_name):
-    resp = _post(client, "/felix/evaluations", {"base_model": job_id, "dataset_name": dataset_name})
-    EVAL_META.write_text(json.dumps(resp, indent=2))
-    f1 = resp.get("f1") or (resp.get("metrics") or {}).get("f1")
-    print(f"  eval F1: {f1}")
-    return resp
+def _eval_metrics(rec):
+    """Pull the metric block out of one evaluation record (Pioneer's field names)."""
+    return {k: rec.get(k) for k in ("f1_score", "precision_score", "recall_score", "accuracy")}
+
+
+def evaluate(client, model_id, dataset_name, label="trained", timeout_s=300):
+    """POST an evaluation of `model_id` on `dataset_name`, then poll until the async
+    job fills in the scores. Pioneer returns the created record under {evaluations:[…]}
+    with status 'pending' -> 'completed' and f1_score/precision_score/recall_score."""
+    resp = _post(client, "/felix/evaluations", {"base_model": model_id, "dataset_name": dataset_name})
+    rec = (resp.get("evaluations") or [resp])[0] if isinstance(resp, dict) else resp
+    eval_id = rec.get("id")
+    t0 = time.time()
+    while eval_id and time.time() - t0 < timeout_s:
+        rec = _get(client, f"/felix/evaluations/{eval_id}")
+        status = str(rec.get("status") or "").lower()
+        if rec.get("f1_score") is not None or status in ("complete", "completed", "succeeded", "done"):
+            break
+        if status in ("failed", "error"):
+            raise RuntimeError(f"evaluation failed: {rec.get('error_message')}")
+        time.sleep(5)
+    m = _eval_metrics(rec)
+    EVAL_META.write_text(json.dumps({"label": label, "model_id": model_id, "metrics": m,
+                                     "record": rec}, indent=2))
+    f1 = m.get("f1_score")
+    print(f"  [{label}] F1={f1}  P={m.get('precision_score')}  R={m.get('recall_score')}  "
+          f"acc={m.get('accuracy')}")
+    return m
+
+
+def _grouped(raw):
+    """Flatten Pioneer's {label:[span,...]} envelope to {label:[text,...]} for printing."""
+    if not isinstance(raw, dict) or "error" in raw:
+        return raw
+    ents = pioneer._entities(raw)
+    return {k: [s.get("text") for s in v] for k, v in ents.items() if v}
 
 
 def infer_sidebyside(base_model, trained_model_id):
@@ -226,8 +256,7 @@ def infer_sidebyside(base_model, trained_model_id):
         except Exception as e:
             trained = {"error": str(e)}
         rows.append({"text": text, "base": base, "trained": trained})
-        print(f"  probe {text[:40]!r}: base={pioneer._find_entities(base)} "
-              f"trained={pioneer._find_entities(trained)}")
+        print(f"  probe {text[:40]!r}: base={_grouped(base)} trained={_grouped(trained)}")
     OUT_DIR.mkdir(parents=True, exist_ok=True)
     SIDEBYSIDE_META.write_text(json.dumps({"base_model": base_model,
                                            "trained_model_id": trained_model_id,
@@ -276,12 +305,20 @@ def main():
             poll(client, job_id)
 
         if args.phase in ("eval", "all"):
-            print("\n== eval ==")
+            print("\n== eval (base vs trained) ==")
+            try:
+                base_m = evaluate(client, args.base_model, args.dataset_name, label="base")
+            except Exception as e:
+                base_m = {}
+                print(f"  base eval skipped: {e}", file=sys.stderr)
             if job_id:
                 try:
-                    evaluate(client, job_id, args.dataset_name)
+                    trained_m = evaluate(client, job_id, args.dataset_name, label="trained")
+                    b, t = base_m.get("f1_score"), trained_m.get("f1_score")
+                    if b is not None and t is not None:
+                        print(f"  F1: base {b:.3f} -> trained {t:.3f}  (Δ {t-b:+.3f})")
                 except Exception as e:
-                    print(f"  eval skipped: {e}", file=sys.stderr)
+                    print(f"  trained eval skipped: {e}", file=sys.stderr)
 
         if args.phase in ("infer", "all"):
             print("\n== infer (base vs trained) ==")

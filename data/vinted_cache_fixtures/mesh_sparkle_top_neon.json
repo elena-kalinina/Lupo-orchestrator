@@ -1,0 +1,28 @@
+[
+  {
+    "id": "t1",
+    "title": "Mesh sparkle crop top",
+    "desc": "haut résille à paillettes, style rave",
+    "price": 15,
+    "size": "S",
+    "brand": "Zara",
+    "seller_id": "t-s1",
+    "persona": "flexible",
+    "photo": "https://img/t1.jpg",
+    "url": "https://vinted/t1",
+    "country": "France"
+  },
+  {
+    "id": "t2",
+    "title": "Black mesh top",
+    "desc": "zwart mesh topje, festival",
+    "price": 11,
+    "size": "M",
+    "brand": "H&M",
+    "seller_id": "t-s2",
+    "persona": "firm",
+    "photo": "https://img/t2.jpg",
+    "url": "https://vinted/t2",
+    "country": "Netherlands"
+  }
+]

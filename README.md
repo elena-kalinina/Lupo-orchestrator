@@ -23,8 +23,12 @@ Two scenarios ship, chosen to show two *different* coordination behaviours:
 
 | Scenario | Budget | The conflict | Your choice | What the org does |
 |----------|--------|--------------|-------------|-------------------|
-| **brunch** | €60 | the standout dress is €8 over its slice | **negotiate** | the Negotiator haggles the seller €32 → €26 |
-| **tomorrowland** | €80 | the hero boots are €16 over their slice | **stretch** | Procurement **reallocates** slack from other categories; total stays €80 |
+| **brunch** | €30 | the standout dress is €4 over its slice | **negotiate** | the Negotiator haggles the seller €15 → €12 |
+| **tomorrowland** | €20 | the hero boots are €4 over their slice | **stretch** | Procurement **reallocates** slack from other categories; total stays €20 |
+
+Budgets are deliberately tight — real second-hand Vinted finds are cheap, and people who
+shop second-hand shop to a tight budget. The conflict is engineered from *real* cached
+prices (see **How the buyer picks** below), not invented numbers.
 
 Three human checkpoints in every run: approve the **vision** (with amendments), approve the
 **budget split**, and **confirm** the purchase. The finish is per-item logistics: items from
@@ -64,9 +68,16 @@ See **`ARCHITECTURE.md`** (and `frontend/architecture.svg`) for the full picture
   confirm / ask the human), and arbitrates conflicts over the shared budget.
 - **Human-in-the-loop channel** — the human is the exec: sets the brief, owns taste,
   approves spend. Reachable over a swappable channel (voice via Gemini TTS, WhatsApp, web).
-- **Model arbitration** — a cheap, multilingual, on-device model (**GLiNER**) handles the
-  routine extraction; only hard cases escalate to a frontier model (**Gemini**); the
-  frontier answers become training data that sharpens the small model (Fastino **Pioneer**).
+- **Model arbitration** — a cheap, multilingual model (**GLiNER2**, via Fastino **Pioneer**)
+  does the extraction; hard cases escalate to a frontier model (**Gemini**); the frontier
+  answers become training data that sharpens the small model. The escalation bar is set high
+  on purpose (confidence < 0.99) so day-1 GLiNER2 escalates aggressively and we **harvest**
+  Gemini's corrections as labelled rows — then fine-tune so the small model needs Gemini less.
+  This is *shown*, not asserted: on the real cached listings GLiNER2 reads the German `Leder`
+  and Italian `pelle` (both *leather*) as style/colour and the Dutch `boho` as a brand; Gemini
+  corrects them to `material: leather`/`linen`, and each correction is logged for the LoRA
+  fine-tune. A real fine-tune on the harvested rows lifts GLiNER2 from **F1 0.188 → 0.267
+  (≈ +42%)** on the held-out eval set. (Full before/after table in **`ARCHITECTURE.md`**.)
 - **Agent roster** (swappable) — Stylist, Buyers, Procurement, Negotiator, Sellers.
 
 **The swappable domain layer** — the tools + catalog. Here: Vinted search over an outfit
@@ -75,6 +86,54 @@ catalog. Swap it for RFQ/URS specs over a product catalog and the core runs tech
 **The same pattern at three scales** — *do the routine, escalate the hard case, learn from
 the result*: agent ↔ human, cheap model ↔ frontier model, buyer ↔ seller. That coherence is
 what makes it a layer, not a script.
+
+---
+
+## How the buyer picks (the buyer's strategy)
+There is one **Buyer** per outfit component (`dress`, `boots`, …); they run in parallel,
+each owning a style slice and a sub-budget. A buyer's job is *find the best match* — never
+to settle the budget or negotiate (that's Procurement, the Coordinator and the Negotiator).
+Its pipeline (`lupo/agents/buyer.py`):
+
+1. **Source candidates** — `vinted.search(query, …)` returns up to 8 listings. Live, it
+   hits the real Vinted API (persistent `curl_cffi` Chrome session, throttled with jitter,
+   429 back-off) scoped to the **women's catalogue** and the wearer's **size** (clothes
+   `M`/`38`, shoes `38`) via `catalog_ids` + size-token filtering; offline it replays the
+   curated cache. The query itself falls back progressively (English style tags → French →
+   single tag → catalogue+size) so multilingual listings still match.
+2. **Extract structure from the mess** — sellers never fill in the fields that matter, so
+   for each listing the buyer runs **GLiNER/Pioneer** over the FR/NL/DE/IT/EN title+desc to
+   pull `material` / `style` / `fit`. Low-confidence listings **escalate to Gemini**, and
+   every escalation is logged as a training sample that later fine-tunes the small model
+   (the adaptive-inference loop).
+3. **Score style-fit** — `_fit()` overlaps the brief's `style_tags` with the listing text
+   **and** the extracted attributes: `0.4 + 0.18 × hits`, capped at `1.0`. Optionally
+   (`USE_REAL_VISION`) the top few candidates are re-scored by **Gemini Vision** on the
+   actual photo, which overrides the keyword score for the final taste call.
+4. **Rank and propose** — candidates are sorted by **`(fit ↓, price ↑)`**: the best style
+   match wins, and **price only breaks ties**, so among equally-good matches the buyer takes
+   the cheapest. The full ranked set is emitted to the canvas as rich find-cards (photo,
+   price, size, language, extracted attrs, fit %, and which one is `best`); the top pick is
+   proposed to the Coordinator, which then settles it against the budget.
+
+**Why fit-first, not price-first?** A cheapest-first buyer would grab a €2 plain tee over a
+€10 mesh-sparkle top and miss the brief. Fit-first picks the *right* item, and the
+shared-budget tension it sometimes creates is exactly the coordination problem Lupo exists
+to solve — the standout piece lands over its slice, and the human decides *negotiate* vs
+*stretch*.
+
+**Demo curation.** Because the buyer ranks by fit, a single pricey high-fit outlier could
+blow a slice and derail the script. `scripts/vinted_live.py narrate <scenario>` shapes each
+slot's **real** cached price band (non-hero slots capped at their allocation; the hero slot
+kept dear-but-resolvable) and tags each item's seller persona — so the *real* finds reliably
+produce the scripted negotiate / stretch beats. Prices are never faked.
+
+Seller **locations are real too**: `narrate --real-countries` looks up each kept seller via
+`/api/v2/users/{id}` and records their actual country/city (honouring `expose_location`).
+The wearer is Belgian (`LUPO_HOME_COUNTRY=Belgique`), so the genuinely local sellers — the
+**Berchem** boots and the **Ekeren** brunch earrings — become in-person pickups, while
+everything else ships from where it actually is (France, Netherlands, Germany, Luxembourg…).
+Matching is by ISO code (`LUPO_HOME_CODE=BE`) because Vinted localises the country name.
 
 ---
 
@@ -102,7 +161,7 @@ lupo-orchestrator/
 │   ├── missions/
 │   │   └── shopping.py         # SCENARIOS (brunch, tomorrowland), run(), traceability()
 │   └── vinted/
-│       └── client.py           # Vinted search with record/replay; _search_live = your client (hackathon day)
+│       └── client.py           # Vinted search with record/replay; live curl_cffi session, throttled + size/catalog filters
 ├── data/
 │   ├── vinted_cache/*.json     # cached real listings per query (record/replay)
 │   ├── events.jsonl            # latest run (the canvas Live tab reads this)
@@ -116,6 +175,9 @@ lupo-orchestrator/
 ├── scripts/
 │   ├── run_mission.py          # run a scenario (LUPO_SCENARIO=brunch|tomorrowland)
 │   ├── cache_vinted.py         # cache real listings for the exact demo queries (real photos)
+│   ├── vinted_live.py          # live fetch + curate/cache; `narrate` shapes price bands + tags country/persona
+│   ├── harvest_samples.py      # batch the cached listings through GLiNER2→Gemini to build the training set fast
+│   ├── pioneer_finetune.py     # real Pioneer NER LoRA finetune: dataset→train→poll→eval→side-by-side
 │   └── finetune_gliner.py      # GLiNER before/after metrics (Fastino prize)
 ├── tests/test_mission.py       # smoke tests (under budget, amendment applied, negotiation saved money)
 ├── ARCHITECTURE.md             # the design + why it generalises (video material)
@@ -138,7 +200,8 @@ Everything off ⇒ fully offline, deterministic. Each real path falls back to th
 | `USE_REAL_VOICE` | `0` | speak human pings via Gemini TTS (rotating tone/language) |
 | `LUPO_HUMAN_CHANNEL` | `scripted` | `scripted` \| `voice` \| `whatsapp` \| `web` |
 | `LUPO_VINTED_LIVE` | `0` | call the real Vinted client and cache (else replay fixtures) |
-| `GLINER_ESCALATION_THRESHOLD` | `0.55` | below this confidence, a listing escalates to Gemini |
+| `LUPO_HOME_COUNTRY` / `LUPO_HOME_CODE` / `LUPO_HOME_CITY` | `Belgique` / `BE` / `Berchem` | the wearer's home; sellers here become in-person pickups, the rest ship |
+| `GLINER_ESCALATION_THRESHOLD` | `0.99` | below this confidence a listing escalates to Gemini — high by design to harvest training rows; lower it after the finetune to show escalations drop |
 | `GEMINI_API_KEY` | — | required when `USE_REAL_GEMINI` / `USE_REAL_VOICE` are on |
 
 Model names live in `lupo/llm.py` (`GEMINI_TEXT_MODEL`, `GEMINI_TTS_MODEL`) — verify them

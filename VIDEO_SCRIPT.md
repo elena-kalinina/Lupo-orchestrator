@@ -22,8 +22,8 @@ Live), `data/events_tomorrowland.jsonl` (already loaded as `events.jsonl`).
 - **[VO]**
   - "Brief: a Tomorrowland outfit, eighty euros. The stylist proposes a look —" *(vision appears)* "— and pings me. I tweak it: mesh top, more sparkle."
   - "It proposes a budget split across the four pieces, and I approve it." *(budget bar)*
-  - "Then it shops Vinted in parallel. These listings are real — French, Dutch, Italian, German — and a small model pulls material, style and fit out of the messy text. When it's unsure," *(point to a GLiNER→Gemini tag)* "it escalates to Gemini."
-  - "Now the interesting part: the platform boots are the hero of the look, but forty euros — sixteen over their budget. It asks me: negotiate, or stretch? I say stretch —" *(reallocation line)* "— and Procurement *reallocates* sixteen euros of slack from the other categories. Total stays under eighty. Nothing overspent."
+  - "Then it shops Vinted in parallel. These listings are real — French, Dutch, Italian, German — and a small model pulls material, style and fit out of the messy text. On the German listing it misreads *Leder* — leather — as a style," *(point to a GLiNER→Gemini tag)* "so it escalates to Gemini, which corrects it to material: leather. That correction becomes training data for the small model."
+  - "Now the interesting part: the platform boots are the hero of the look, but ten euros — four over their slice. It asks me: negotiate, or stretch? I say stretch —" *(reallocation line)* "— and Procurement *reallocates* four euros of slack from the other categories. Total stays at twenty. Nothing overspent."
   - *(optional, play audio)* a funny voice ping: "[hyped, German] Die Boots sind der Star — strecken wir das Budget?"
   - "Final beat: the finds are from four sellers in four countries. So three ship — paid online — and only the local Munich pair becomes an in-person pickup, with the tram and the cash for *that* item."
 - **[VO, one line]** "In the brunch run, the same conflict ends differently — it haggles the seller down instead."

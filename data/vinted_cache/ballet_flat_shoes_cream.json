@@ -1,28 +1,17 @@
 [
   {
-    "id": "sh2",
-    "title": "Tan ballet flats leather",
-    "desc": "Ballerines en cuir véritable, taille normale, très bon état",
-    "price": 14,
-    "size": "38",
-    "brand": "Mango",
-    "seller_id": "s5",
-    "persona": "flexible",
-    "photo": "https://img/sh2.jpg",
-    "url": "https://vinted/sh2",
-    "country": "France"
-  },
-  {
-    "id": "sh3",
-    "title": "Beige ballet flats",
-    "desc": "leren ballerina's, valt groot",
-    "price": 12,
+    "id": "9133683466",
+    "title": "Ballerina flats",
+    "desc": "Ballerina flats",
+    "price": 5.0,
     "size": "38",
     "brand": "H&M",
-    "seller_id": "s6",
-    "persona": "motivated",
-    "photo": "https://img/sh3.jpg",
-    "url": "https://vinted/sh3",
-    "country": "Netherlands"
+    "seller_id": "56782280",
+    "photo": "https://images1.vinted.net/t/04_02607_LPYAccUY49v8Zt6QyQopFSZv/f800/1781035256.jpeg?s=8eb738de29015f2f04e8508ae15e82271241d5c2",
+    "country": "Luxembourg",
+    "url": "https://www.vinted.fr/items/9133683466-ballerina-flats",
+    "persona": "flexible",
+    "country_code": "LU",
+    "city": "Luxembourg"
   }
 ]

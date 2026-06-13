@@ -1,0 +1,13 @@
+[
+  {
+    "id": "sh1",
+    "title": "Tan leather sandals",
+    "price": 15,
+    "size": "38",
+    "brand": "Clarks",
+    "seller_id": "s4",
+    "persona": "flexible",
+    "photo": "https://img/sh1.jpg",
+    "url": "https://vinted/sh1"
+  }
+]

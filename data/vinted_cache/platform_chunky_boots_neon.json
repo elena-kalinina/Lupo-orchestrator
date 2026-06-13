@@ -1,28 +1,30 @@
 [
   {
-    "id": "bt1",
-    "title": "Buffalo platform chunky boots",
-    "desc": "Plateaustiefel, robust, Kunstleder, getragen",
-    "price": 40,
-    "size": "39",
-    "brand": "Buffalo",
-    "seller_id": "t-s7",
+    "id": "8878313510",
+    "title": "Chunky Black Platform Lace-Up Shoes",
+    "desc": "Chunky Black Platform Lace-Up Shoes",
+    "price": 10.0,
+    "size": "38",
+    "brand": "H&M",
+    "seller_id": "112565288",
+    "photo": "https://images1.vinted.net/t/05_018fe_2Topnw3ePyQrhyQSuV2SdcUU/f800/1778435517.jpeg?s=cd3d03a4feb1e7b39e6b937ec57e62dbcb8a09a1",
+    "country": "Belgique",
+    "url": "https://www.vinted.fr/items/8878313510-chunky-black-platform-lace-up-shoes",
     "persona": "firm",
-    "photo": "https://img/bt1.jpg",
-    "url": "https://vinted/bt1",
-    "country": "Germany"
+    "country_code": "BE",
+    "city": "Berchem"
   },
   {
-    "id": "bt2",
-    "title": "Black platform boots",
-    "desc": "zwarte plateau laarzen",
-    "price": 28,
-    "size": "39",
-    "brand": "NoName",
-    "seller_id": "t-s8",
-    "persona": "flexible",
-    "photo": "https://img/bt2.jpg",
-    "url": "https://vinted/bt2",
-    "country": "Netherlands"
+    "id": "7863613756",
+    "title": "White Chunky Dad Sneakers - Y2K Aesthetic - Brand New - Size 38",
+    "desc": "White Chunky Dad Sneakers - Y2K Aesthetic - Brand New - Size 38",
+    "price": 12.0,
+    "size": "38",
+    "brand": "No Label",
+    "seller_id": "3126343508",
+    "photo": "https://images1.vinted.net/t/06_006f8_2nCamfyj3RSM2xurLDhq9SjV/f800/1767449810.jpeg?s=6fdc341434b7ed23b1a430c7b53a7393e35a02da",
+    "country": "Germany",
+    "url": "https://www.vinted.fr/items/7863613756-white-chunky-dad-sneakers-y2k-aesthetic-brand-new-size-38",
+    "persona": "firm"
   }
 ]

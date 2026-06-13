@@ -1,13 +1,17 @@
 [
   {
-    "id": "sh1",
-    "title": "Tan leather sandals",
-    "price": 15,
+    "id": "7172222791",
+    "title": "Wedge sandals",
+    "desc": "Wedge sandals",
+    "price": 10.0,
     "size": "38",
-    "brand": "Clarks",
-    "seller_id": "s4",
+    "brand": "Mango",
+    "seller_id": "27928708",
+    "photo": "https://images1.vinted.net/t/01_01c83_738W5jUJL4dh3vy6X2Sonwx6/f800/1758894978.jpeg?s=22f27bb1192c6a9caa10ef2467aaa347dbe0b8d9",
+    "country": "Pays-Bas",
+    "url": "https://www.vinted.fr/items/7172222791-wedge-sandals",
     "persona": "flexible",
-    "photo": "https://img/sh1.jpg",
-    "url": "https://vinted/sh1"
+    "country_code": "NL",
+    "city": "Eindhoven"
   }
 ]

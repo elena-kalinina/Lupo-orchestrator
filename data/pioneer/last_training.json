@@ -1,0 +1,49 @@
+{
+  "job_id": "b8210478-8cd3-43f6-9efe-8bae982b1af4",
+  "dataset_name": "lupo-attrs-v1",
+  "response": {
+    "id": "b8210478-8cd3-43f6-9efe-8bae982b1af4",
+    "user_id": "063aaea6-a25b-4023-a0aa-571407435dd1",
+    "project_id": "5aa29dd2-3296-4db4-8f9f-02faf9fa2f6b",
+    "model_name": "lupo-attrs-lora",
+    "datasets": [
+      {
+        "name": "lupo-attrs-v1",
+        "version": "1"
+      }
+    ],
+    "base_model": "fastino/gliner2-base-v1",
+    "validation_data_percentage": 0.2,
+    "nr_epochs": 5,
+    "learning_rate": 5e-05,
+    "batch_size": 4,
+    "trained_model_path": null,
+    "job_reference": "b8210478-8cd3-43f6-9efe-8bae982b1af4",
+    "instance_type": "ml.g4dn.xlarge",
+    "status": "requested",
+    "normalized_status": "requested",
+    "is_terminal_status": false,
+    "error_message": null,
+    "created_at": "2026-06-13T15:41:44.58124+00:00",
+    "updated_at": "2026-06-13T15:41:44.58124+00:00",
+    "started_at": null,
+    "completed_at": null,
+    "model_auto_selected": false,
+    "model_selection_reason": null,
+    "task_type": "ner",
+    "labels": [
+      "fit",
+      "material",
+      "style"
+    ],
+    "example": null,
+    "metrics": null,
+    "version_number": "1",
+    "root_job_id": null,
+    "provider_deployments": null,
+    "provider_name": "modal",
+    "progress_percent": null,
+    "current_epoch": null,
+    "deployment_status": null
+  }
+}

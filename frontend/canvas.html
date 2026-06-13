@@ -76,6 +76,11 @@
   .ctags{display:flex;gap:4px;flex-wrap:wrap}
   .ct{font-size:10px;background:#17151C;color:var(--muted);border-radius:4px;padding:1px 6px}
   .ct.best{background:var(--mint);color:#17151C}.ct.warn{background:var(--amber);color:#17151C}
+  /* checkout listing links */
+  .links{display:flex;flex-direction:column;gap:5px;margin-top:6px}
+  .listing-link{font-family:Inter;font-size:12.5px;color:var(--mint);text-decoration:none;
+    border:1px solid var(--mint);border-radius:8px;padding:6px 10px;transition:.2s}
+  .listing-link:hover{background:var(--mint);color:#17151C}
   /* outfit */
   .outfit{display:flex;gap:10px;margin-top:18px;flex-wrap:wrap}
   .tile{border:1px dashed var(--line);border-radius:12px;padding:12px 14px;min-width:140px;opacity:.4;transition:.4s}
@@ -96,7 +101,8 @@
   .preview{margin:0 0 14px;border:1px solid var(--line);border-radius:14px;overflow:hidden;
     background:var(--surface);display:none}
   .preview.show{display:block;animation:in .5s ease}
-  .preview img{display:block;width:100%;max-height:340px;object-fit:cover}
+  /* contain (not cover) so the full head-to-toe lookbook shows; letterbox on the dark surface */
+  .preview img{display:block;width:100%;max-height:62vh;min-height:320px;object-fit:contain;background:var(--ink)}
   .preview .cap{padding:8px 12px;font-size:12px;color:var(--muted);
     display:flex;justify-content:space-between;gap:10px;align-items:center}
   .preview .cap .regen{color:var(--rose);font-weight:600;opacity:0;transition:.3s}
@@ -133,8 +139,8 @@
   </header>
 
   <div class="scn">
-    <button data-s="brunch" class="on">Brunch · €60 · negotiate</button>
-    <button data-s="tomorrowland">Tomorrowland · €80 · reallocate</button>
+    <button data-s="brunch" class="on">Brunch · €30 · negotiate</button>
+    <button data-s="tomorrowland">Tomorrowland · €20 · reallocate</button>
     <button data-s="live">Replay ↻</button>
     <button id="runlive" class="live">● Run live (server)</button>
   </div>
@@ -180,74 +186,91 @@ const ROLES = [
   ["human","You (exec)","taste · approvals"],
 ];
 // Embedded fallback so the canvas works on double-click (file://, no server).
+// Embedded fallback = a REAL captured run (cached Vinted finds, real prices, real
+// seller countries, real Gemini escalations). Mirrors what "Run live (server)"
+// produces, so the offline double-click demo and the live demo tell the same story.
 const EMBEDDED = [
-{"seq":1,"kind":"task","actor":"coordinator","text":"Mission: 'Sunday brunch with the girls — cute but comfy' within €60"},
-{"seq":2,"kind":"message","actor":"stylist","text":"Vision: cream/sage/gold — dress, shoes, bag, jewellery"},
-{"seq":3,"kind":"escalation","actor":"coordinator","text":"ASK human: approve the vision?"},
-{"seq":4,"kind":"human_reply","actor":"human","text":"amend: ballet flats instead of sandals, and a small shoulder bag"},
-{"seq":5,"kind":"decision","actor":"stylist","text":"Amended shoes: sandals → ballet flats"},
-{"seq":6,"kind":"decision","actor":"stylist","text":"Amended bag: tote → small shoulder bag"},
-{"seq":7,"kind":"budget","actor":"procurement","text":"Allocations: dress €24, shoes €17, bag €12, jewellery €7"},
-{"seq":8,"kind":"escalation","actor":"coordinator","text":"ASK human: approve the budget split?"},
-{"seq":9,"kind":"human_reply","actor":"human","text":"approve"},
-{"seq":10,"kind":"candidates","actor":"buyer","text":"dress: ranked 3 finds","candidates":[
-  {"title":"Zara floral midi casual dress","price":32,"size":"M","lang":"fr","desc":"Robe midi fleurie en coton, style bohème, taille normale","attrs":["cotton","boho","true-to-size"],"fit":94,"best":true},
-  {"title":"H&M cream sundress","price":18,"size":"M","lang":"nl","desc":"Lichte zomerjurk, katoen, valt klein","attrs":["cotton","fits-small"],"fit":60,"best":false},
-  {"title":"Mango midi floral","price":24,"size":"S","lang":"it","desc":"vestito midi a fiori, nuovo con cartellino","attrs":[],"fit":40,"best":false,"source":"gemini-escalation"}]},
-{"seq":11,"kind":"escalation","actor":"coordinator","text":"dress is €32 — €8 over its €24 budget. Raiding other categories risks the rest of the look."},
-{"seq":12,"kind":"human_reply","actor":"human","text":"negotiate"},
-{"seq":13,"kind":"negotiation","actor":"negotiator","text":"open €24 (ask €32, target €28)"},
-{"seq":14,"kind":"negotiation","actor":"seller","text":"counter €29"},
-{"seq":15,"kind":"negotiation","actor":"negotiator","text":"raise to €26"},
-{"seq":16,"kind":"deal","actor":"negotiator","text":"DEAL at €26 (saved €6)"},
-{"seq":17,"kind":"decision","actor":"coordinator","text":"Acquire dress: 'Zara floral midi casual dress' @ €26 | remaining €34"},
-{"seq":18,"kind":"message","actor":"buyer","text":"shoes: pick 'Tan ballet flats leather' €14 (fit 100%)"},
-{"seq":19,"kind":"decision","actor":"coordinator","text":"Acquire shoes: 'Tan ballet flats leather' @ €14 | remaining €20"},
-{"seq":20,"kind":"message","actor":"buyer","text":"bag: pick 'Mini summer shoulder bag' €10 (fit 80%)"},
-{"seq":21,"kind":"decision","actor":"coordinator","text":"Acquire bag: 'Mini summer shoulder bag' @ €10 | remaining €10"},
-{"seq":22,"kind":"message","actor":"buyer","text":"jewellery: pick 'Gold dainty hoops earrings' €8 (fit 100%)"},
-{"seq":23,"kind":"budget","actor":"procurement","text":"Absorbed €1 overspend on jewellery from slack"},
-{"seq":24,"kind":"decision","actor":"coordinator","text":"Acquire jewellery: 'Gold dainty hoops earrings' @ €8 | remaining €2"},
-{"seq":25,"kind":"decision","actor":"coordinator","text":"Outfit: 4/4 items, total €58 / €60"},
-{"seq":26,"kind":"escalation","actor":"coordinator","text":"CONFIRM purchase (spends money)"},
-{"seq":27,"kind":"human_reply","actor":"human","text":"confirm"},
-{"seq":28,"kind":"deal","actor":"coordinator","text":"Purchase confirmed"},
-{"seq":29,"kind":"message","actor":"coordinator","text":"Paid online — dress, shoes, bag and hoops ship from France & the Netherlands. Orders placed; tracking to follow. Nothing to pick up."}
+{"seq": 1, "kind": "task", "actor": "coordinator", "text": "Mission: 'Sunday brunch with the girls — cute but comfy' within €30"},
+{"seq": 2, "kind": "message", "actor": "stylist", "text": "Vision: ['cream', 'sage', 'gold'] palette — dress (floral/midi/casual), shoes (sandals/tan/flat), bag (raffia/tote/summer), jewellery (gold/hoops/dainty)"},
+{"seq": 3, "kind": "escalation", "actor": "coordinator", "text": "ASK human: approve the vision? (needs human taste/spec input)"},
+{"seq": 4, "kind": "human_reply", "actor": "human", "text": "amend: ballet flats instead of sandals, and a small shoulder bag"},
+{"seq": 5, "kind": "decision", "actor": "stylist", "text": "Amended shoes: sandals → ballet flats"},
+{"seq": 6, "kind": "decision", "actor": "stylist", "text": "Amended bag: tote → small shoulder bag"},
+{"seq": 7, "kind": "budget", "actor": "procurement", "text": "Allocations: dress €11, shoes €6, bag €6, jewellery €7"},
+{"seq": 8, "kind": "escalation", "actor": "coordinator", "text": "Asking you to approve the budget split."},
+{"seq": 9, "kind": "human_reply", "actor": "human", "text": "approve"},
+{"seq": 10, "kind": "task", "actor": "buyer", "text": "dress: 2 candidates (alloc €11)"},
+{"seq": 11, "kind": "candidates", "actor": "buyer", "text": "dress: ranked 2 finds", "candidates": [{"title": "Mango - Clean girl beige summer dress", "price": 15.0, "size": "M / 38 / 10", "lang": "en", "desc": "Mango - Clean girl beige summer dress", "photo": "https://images1.vinted.net/t/01_01824_WK4eLk49V5pjmLzfSNT8Abez/f800/1780853658.jpeg?s=30003276216c8a50d4ff2e797c1e514ed65a1ab7", "country": "France", "attrs": ["unknown"], "source": "gemini-escalation", "fit": 40, "best": true}, {"title": "sand dress with belt", "price": 15.0, "size": "M / 38 / 10", "lang": "en", "desc": "sand dress with belt", "photo": "https://images1.vinted.net/t/03_01943_Qe24PhUdyCotpbjbhwuvCBiJ/f800/1779716594.jpeg?s=08819c6761cbbca59f53d7450eb7b0fa95a734df", "country": "Pays-Bas", "attrs": ["unknown"], "source": "gemini-escalation", "fit": 40, "best": false}]},
+{"seq": 12, "kind": "message", "actor": "buyer", "text": "dress: pick 'Mango - Clean girl beige summer dress' €15.0 (fit 40%)"},
+{"seq": 13, "kind": "escalation", "actor": "coordinator", "text": "dress 'Mango - Clean girl beige summer dress' is €15 — €4 over its €11 budget. Raiding other categories risks the rest of the look."},
+{"seq": 14, "kind": "human_reply", "actor": "human", "text": "negotiate"},
+{"seq": 15, "kind": "negotiation", "actor": "negotiator", "text": "open €11 on 'Mango - Clean girl beige summer dress' (ask €15, target €13)"},
+{"seq": 16, "kind": "negotiation", "actor": "seller:9115159938", "text": "counter €14"},
+{"seq": 17, "kind": "negotiation", "actor": "negotiator", "text": "raise to €12"},
+{"seq": 18, "kind": "deal", "actor": "negotiator", "text": "DEAL at €12 (saved €3)"},
+{"seq": 19, "kind": "decision", "actor": "coordinator", "text": "Acquire dress: 'Mango - Clean girl beige summer dress' @ €12 | remaining €18"},
+{"seq": 20, "kind": "task", "actor": "buyer", "text": "shoes: 1 candidates (alloc €6)"},
+{"seq": 21, "kind": "candidates", "actor": "buyer", "text": "shoes: ranked 1 finds", "candidates": [{"title": "Ballerina flats", "price": 5.0, "size": "38", "lang": "en", "desc": "Ballerina flats", "photo": "https://images1.vinted.net/t/04_02607_LPYAccUY49v8Zt6QyQopFSZv/f800/1781035256.jpeg?s=8eb738de29015f2f04e8508ae15e82271241d5c2", "country": "Luxembourg", "attrs": ["unknown"], "source": "gemini-escalation", "fit": 58, "best": true}]},
+{"seq": 22, "kind": "message", "actor": "buyer", "text": "shoes: pick 'Ballerina flats' €5.0 (fit 58%)"},
+{"seq": 23, "kind": "decision", "actor": "coordinator", "text": "Acquire shoes: 'Ballerina flats' @ €5 | remaining €13"},
+{"seq": 24, "kind": "task", "actor": "buyer", "text": "bag: 1 candidates (alloc €6)"},
+{"seq": 25, "kind": "candidates", "actor": "buyer", "text": "bag: ranked 1 finds", "candidates": [{"title": "Black small MANGO shoulder bag", "price": 5.0, "size": "", "lang": "en", "desc": "Black small MANGO shoulder bag", "photo": "https://images1.vinted.net/t/04_00d06_VhMevS3hzSwY99i1GW2sJthV/f800/1762199799.jpeg?s=d877fc6cc2862698d80f2d6d101b344b1dae1792", "country": "Pays-Bas", "attrs": ["unknown"], "source": "gemini-escalation", "fit": 76, "best": true}]},
+{"seq": 26, "kind": "message", "actor": "buyer", "text": "bag: pick 'Black small MANGO shoulder bag' €5.0 (fit 76%)"},
+{"seq": 27, "kind": "decision", "actor": "coordinator", "text": "Acquire bag: 'Black small MANGO shoulder bag' @ €5 | remaining €8"},
+{"seq": 28, "kind": "task", "actor": "buyer", "text": "jewellery: 4 candidates (alloc €7)"},
+{"seq": 29, "kind": "candidates", "actor": "buyer", "text": "jewellery: ranked 4 finds", "candidates": [{"title": "Vintage Gold Tone Clip-On Hoop Earrings Classic Minimalist Small Hoops 80s Retro", "price": 7.0, "size": "", "lang": "en", "desc": "Vintage Gold Tone Clip-On Hoop Earrings Classic Minimalist Small Hoops 80s Retro", "photo": "https://images1.vinted.net/t/06_02483_rGVth1pndxtGdkVTRfEiu1cV/f800/1777036412.jpeg?s=c4c0b173bdc4663a1cd3a12cb8cf2cef7a4a9d72", "country": "Belgique", "attrs": ["unknown", "vintage", "minimalist"], "source": "gemini-escalation", "fit": 76, "best": true}, {"title": "Gold-plated hoop earrings La Hera", "price": 3.0, "size": "", "lang": "en", "desc": "Gold-plated hoop earrings La Hera", "photo": "https://images1.vinted.net/t/02_01864_Nibz5JtKDkzGuswhpVQPWHPg/f800/1757769757.jpeg?s=0dbd0cbc476143a0b2269c8498a2ceef084b606e", "country": "Belgique", "attrs": ["unknown"], "source": "gemini-escalation", "fit": 58, "best": false}, {"title": "Hoops oorbellen", "price": 5.0, "size": "", "lang": "en", "desc": "Hoops oorbellen", "photo": "https://images1.vinted.net/t/05_00c1b_VJgYmjPkMnHp3sJEAZTz1umz/f800/1770546725.jpeg?s=26ddb3c9efb256a28650de98781402e0eead0fd4", "country": "France", "attrs": ["unknown"], "source": "gemini-escalation", "fit": 58, "best": false}]},
+{"seq": 30, "kind": "message", "actor": "buyer", "text": "jewellery: pick 'Vintage Gold Tone Clip-On Hoop Earrings Classic Minimalist Small Hoops 80s Retro' €7.0 (fit 76%)"},
+{"seq": 31, "kind": "decision", "actor": "coordinator", "text": "Acquire jewellery: 'Vintage Gold Tone Clip-On Hoop Earrings Classic Minimalist Small Hoops 80s Retro' @ €7 | remaining €1"},
+{"seq": 32, "kind": "decision", "actor": "coordinator", "text": "Outfit: 4/4 items, total €29 / €30"},
+{"seq": 33, "kind": "links", "actor": "coordinator", "text": "Here are the exact listings — open each one to review and check out yourself (I never spend money for you):", "links": [{"title": "Mango - Clean girl beige summer dress", "url": "https://www.vinted.fr/items/9115159938-mango-clean-girl-beige-summer-dress"}, {"title": "Ballerina flats", "url": "https://www.vinted.fr/items/9133683466-ballerina-flats"}, {"title": "Black small MANGO shoulder bag", "url": "https://www.vinted.fr/items/7474539825-black-small-mango-shoulder-bag"}, {"title": "Vintage Gold Tone Clip-On Hoop Earrings Classic Minimalist Small Hoops 80s Retro", "url": "https://www.vinted.fr/items/8547380329-vintage-gold-tone-clip-on-hoop-earrings-classic-minimalist-small-hoops-80s-retro"}]},
+{"seq": 34, "kind": "escalation", "actor": "coordinator", "text": "CONFIRM purchase (spends money / real-world action)"},
+{"seq": 35, "kind": "human_reply", "actor": "human", "text": "confirm"},
+{"seq": 36, "kind": "deal", "actor": "coordinator", "text": "Purchase confirmed"},
+{"seq": 37, "kind": "message", "actor": "coordinator", "text": "Paid online — dress from France, shoes from Luxembourg, bag from Pays-Bas will ship. Orders placed, I've messaged each seller; tracking to follow."},
+{"seq": 38, "kind": "message", "actor": "coordinator", "text": "The jewellery seller is local in Ekeren. For that one: bring €7 cash and tap to send the pickup message I drafted. (Everything else ships.)"}
 ];
 const EMBEDDED_TOMORROWLAND = [
-{"seq":1,"kind":"task","actor":"coordinator","text":"Mission: 'Tomorrowland mainstage, Saturday night — bold, rave-ready' within €80"},
-{"seq":2,"kind":"message","actor":"stylist","text":"Vision: neon/black/holographic — top, bottoms, accessories, boots"},
-{"seq":3,"kind":"escalation","actor":"coordinator","text":"ASK human: approve the vision?"},
-{"seq":4,"kind":"human_reply","actor":"human","text":"make it a mesh top and add some sparkle"},
-{"seq":5,"kind":"decision","actor":"stylist","text":"Amended top: plain → mesh + sparkle"},
-{"seq":6,"kind":"budget","actor":"procurement","text":"Allocations: top €20, bottoms €24, accessories €12, boots €24"},
-{"seq":7,"kind":"escalation","actor":"coordinator","text":"ASK human: approve the budget split?"},
-{"seq":8,"kind":"human_reply","actor":"human","text":"approve"},
-{"seq":9,"kind":"message","actor":"buyer","text":"top: pick 'Mesh sparkle crop top' €15 (fit 76%)"},
-{"seq":10,"kind":"decision","actor":"coordinator","text":"Acquire top: 'Mesh sparkle crop top' @ €15 | remaining €65"},
-{"seq":11,"kind":"message","actor":"buyer","text":"bottoms: pick 'Cargo techno pants black' €18 (fit 76%)"},
-{"seq":12,"kind":"decision","actor":"coordinator","text":"Acquire bottoms: 'Cargo techno pants black' @ €18 | remaining €47"},
-{"seq":13,"kind":"message","actor":"buyer","text":"accessories: pick 'Holographic sunglasses rave' €6 (fit 76%)"},
-{"seq":14,"kind":"decision","actor":"coordinator","text":"Acquire accessories: 'Holographic sunglasses rave' @ €6 | remaining €41"},
-{"seq":15,"kind":"candidates","actor":"buyer","text":"boots: ranked 2 finds","candidates":[
-  {"title":"Buffalo platform chunky boots","price":40,"size":"39","lang":"de","country":"Germany","desc":"Plateaustiefel, robust, Kunstleder","attrs":["platform","chunky"],"fit":88,"best":true,"source":"gemini-escalation"},
-  {"title":"Black platform boots","price":28,"size":"39","lang":"nl","country":"Netherlands","desc":"zwarte plateau laarzen","attrs":["platform"],"fit":60,"best":false}]},
-{"seq":16,"kind":"escalation","actor":"coordinator","text":"boots are €40 — €16 over their €24 budget, and the hero of the look. Negotiate, or stretch?"},
-{"seq":17,"kind":"human_reply","actor":"human","text":"stretch"},
-{"seq":18,"kind":"budget","actor":"procurement","text":"Reallocated €16 from other categories → boots (total stays €80)"},
-{"seq":19,"kind":"decision","actor":"coordinator","text":"Acquire boots: 'Buffalo platform chunky boots' @ €40 | remaining €1"},
-{"seq":20,"kind":"decision","actor":"coordinator","text":"Outfit: 4/4 items, total €79 / €80"},
-{"seq":21,"kind":"escalation","actor":"coordinator","text":"CONFIRM purchase (spends money)"},
-{"seq":22,"kind":"human_reply","actor":"human","text":"confirm"},
-{"seq":23,"kind":"deal","actor":"coordinator","text":"Purchase confirmed"},
-{"seq":24,"kind":"message","actor":"coordinator","text":"Paid online — top from France, bottoms from the Netherlands, accessories from Italy will ship. Tracking to follow."},
-{"seq":25,"kind":"message","actor":"coordinator","text":"The boots seller is local in Munich. For those: U3/U6 to Universität, bring €40 cash, tap to send the pickup message I drafted. Everything else ships."}
+{"seq": 1, "kind": "task", "actor": "coordinator", "text": "Mission: 'Tomorrowland mainstage, Saturday night — bold, rave-ready, danceable' within €20"},
+{"seq": 2, "kind": "message", "actor": "stylist", "text": "Vision: ['neon', 'black', 'holographic'] palette — boots (platform/chunky), top (crop/plain), bottoms (cargo/techno), accessories (holographic/sunglasses)"},
+{"seq": 3, "kind": "escalation", "actor": "coordinator", "text": "ASK human: approve the vision? (needs human taste/spec input)"},
+{"seq": 4, "kind": "human_reply", "actor": "human", "text": "amend: make it a mesh top and add some sparkle"},
+{"seq": 5, "kind": "decision", "actor": "stylist", "text": "Amended top: plain → mesh + sparkle"},
+{"seq": 6, "kind": "budget", "actor": "procurement", "text": "Allocations: boots €6, top €5, bottoms €6, accessories €3"},
+{"seq": 7, "kind": "escalation", "actor": "coordinator", "text": "Asking you to approve the budget split."},
+{"seq": 8, "kind": "human_reply", "actor": "human", "text": "approve"},
+{"seq": 9, "kind": "task", "actor": "buyer", "text": "boots: 2 candidates (alloc €6)"},
+{"seq": 10, "kind": "candidates", "actor": "buyer", "text": "boots: ranked 2 finds", "candidates": [{"title": "Chunky Black Platform Lace-Up Shoes", "price": 10.0, "size": "38", "lang": "en", "desc": "Chunky Black Platform Lace-Up Shoes", "photo": "https://images1.vinted.net/t/05_018fe_2Topnw3ePyQrhyQSuV2SdcUU/f800/1778435517.jpeg?s=cd3d03a4feb1e7b39e6b937ec57e62dbcb8a09a1", "country": "Belgique", "attrs": ["unknown"], "source": "gemini-escalation", "fit": 76, "best": true}, {"title": "White Chunky Dad Sneakers - Y2K Aesthetic - Brand New - Size 38", "price": 12.0, "size": "38", "lang": "en", "desc": "White Chunky Dad Sneakers - Y2K Aesthetic - Brand New - Size 38", "photo": "https://images1.vinted.net/t/06_006f8_2nCamfyj3RSM2xurLDhq9SjV/f800/1767449810.jpeg?s=6fdc341434b7ed23b1a430c7b53a7393e35a02da", "country": "Germany", "attrs": ["unknown", "y2k"], "source": "gemini-escalation", "fit": 58, "best": false}]},
+{"seq": 11, "kind": "message", "actor": "buyer", "text": "boots: pick 'Chunky Black Platform Lace-Up Shoes' €10.0 (fit 76%)"},
+{"seq": 12, "kind": "escalation", "actor": "coordinator", "text": "boots 'Chunky Black Platform Lace-Up Shoes' is €10 — €4 over its €6 budget. Raiding other categories risks the rest of the look."},
+{"seq": 13, "kind": "human_reply", "actor": "human", "text": "stretch"},
+{"seq": 14, "kind": "budget", "actor": "procurement", "text": "Reallocated €4 from other categories → boots"},
+{"seq": 15, "kind": "decision", "actor": "coordinator", "text": "Acquire boots: 'Chunky Black Platform Lace-Up Shoes' @ €10 | remaining €10"},
+{"seq": 16, "kind": "task", "actor": "buyer", "text": "top: 6 candidates (alloc €4)"},
+{"seq": 17, "kind": "candidates", "actor": "buyer", "text": "top: ranked 6 finds", "candidates": [{"title": "Black mesh sparkle shirt from Atmosphere", "price": 3.0, "size": "M / 38 / 10", "lang": "en", "desc": "Black mesh sparkle shirt from Atmosphere", "photo": "https://images1.vinted.net/t/06_0224e_3F6rdeCS5FvEwi6FCYQL2yqM/f800/1771061075.jpeg?s=bc7c141ebec7f9793c172a6c01602707c8420062", "country": "France", "attrs": ["unknown"], "source": "gemini-escalation", "fit": 76, "best": true}, {"title": "Mango Simona Black Mesh Rhinestone Top | Festive Sparkle See Through Blouse", "price": 5.0, "size": "M / 38 / 10", "lang": "en", "desc": "Mango Simona Black Mesh Rhinestone Top | Festive Sparkle See Through Blouse", "photo": "https://images1.vinted.net/t/05_00321_4e7UVVwsQv7dU6GpYGZ8KHio/f800/1778667181.jpeg?s=ef483a797f2936c600f186aeff60ae1c5778afd5", "country": "Pays-Bas", "attrs": ["unknown"], "source": "gemini-escalation", "fit": 76, "best": false}, {"title": "Mesh Sparkle Party Top", "price": 5.0, "size": "M / 38 / 10", "lang": "en", "desc": "Mesh Sparkle Party Top", "photo": "https://images1.vinted.net/t/02_01e7c_xBqcbQNLoRviYh2kM1PWHr8C/f800/1763486281.jpeg?s=e2c47a1cc3b51ddc86f58fbd1ba2c1783d67180e", "country": "France", "attrs": ["unknown"], "source": "gemini-escalation", "fit": 76, "best": false}]},
+{"seq": 18, "kind": "message", "actor": "buyer", "text": "top: pick 'Black mesh sparkle shirt from Atmosphere' €3.0 (fit 76%)"},
+{"seq": 19, "kind": "decision", "actor": "coordinator", "text": "Acquire top: 'Black mesh sparkle shirt from Atmosphere' @ €3 | remaining €7"},
+{"seq": 20, "kind": "task", "actor": "buyer", "text": "bottoms: 4 candidates (alloc €4)"},
+{"seq": 21, "kind": "candidates", "actor": "buyer", "text": "bottoms: ranked 4 finds", "candidates": [{"title": "Schwarze Parachute Cargo Hose im Baggy Fit", "price": 4.0, "size": "M / 38 / 10", "lang": "en", "desc": "Schwarze Parachute Cargo Hose im Baggy Fit", "photo": "https://images1.vinted.net/t/06_0069f_efEGYLCJPKoTAGciwJ8vVQ2o/f800/1779017270.jpeg?s=dbd3afa43d20c1167d2e27ac090dcc83245286a6", "country": "Allemagne", "attrs": ["unknown"], "source": "gemini-escalation", "fit": 58, "best": true}, {"title": "Pantalon marron droit cargo large", "price": 5.0, "size": "M / 38 / 10", "lang": "en", "desc": "Pantalon marron droit cargo large", "photo": "https://images1.vinted.net/t/06_01f96_HtnqAhd2pZXb1zF5YtXqqLGs/f800/1778840268.jpeg?s=f0d1ce1b7d147399b8cc4b8c48a4b99646388740", "country": "France", "attrs": ["unknown"], "source": "gemini-escalation", "fit": 58, "best": false}, {"title": "y2k monki cargo pants", "price": 5.0, "size": "M / 38 / 10", "lang": "en", "desc": "y2k monki cargo pants", "photo": "https://images1.vinted.net/t/04_01082_mL17cUfVg1NubAEPB2MFNbjS/f800/1744116883.jpeg?s=96614b243b2349d35c139245132956a0307ff699", "country": "Allemagne", "attrs": ["unknown", "y2k"], "source": "gemini-escalation", "fit": 58, "best": false}]},
+{"seq": 22, "kind": "message", "actor": "buyer", "text": "bottoms: pick 'Schwarze Parachute Cargo Hose im Baggy Fit' €4.0 (fit 58%)"},
+{"seq": 23, "kind": "decision", "actor": "coordinator", "text": "Acquire bottoms: 'Schwarze Parachute Cargo Hose im Baggy Fit' @ €4 | remaining €3"},
+{"seq": 24, "kind": "task", "actor": "buyer", "text": "accessories: 3 candidates (alloc €2)"},
+{"seq": 25, "kind": "candidates", "actor": "buyer", "text": "accessories: ranked 3 finds", "candidates": [{"title": "3 Sunglasses Bundle: White Shield, Mirrored Lens, Orange Acetate Frames", "price": 3.0, "size": "", "lang": "en", "desc": "3 Sunglasses Bundle: White Shield, Mirrored Lens, Orange Acetate Frames", "photo": "https://images1.vinted.net/t/05_015cb_Ro5rALL69uS1vgfMVmjzMtq1/f800/1781181313.jpeg?s=87816c1f61972829c467447df03a2589fe4870bb", "country": "Pays-Bas", "attrs": ["unknown"], "source": "gemini-escalation", "fit": 58, "best": true}, {"title": "SHEIN (y2k style) Glasses", "price": 2.0, "size": "", "lang": "en", "desc": "SHEIN (y2k style) Glasses", "photo": "https://images1.vinted.net/t/06_019ba_j7YrcEeGdkRVUPinsmhigEJL/f800/1778937257.jpeg?s=4359f43edd07cd4fb9877e8fa0b313cfa0399779", "country": "Italy", "attrs": ["unknown", "y2k"], "source": "gemini-escalation", "fit": 40, "best": false}, {"title": "Turquoise blue mirror sunnies H&M", "price": 2.5, "size": "", "lang": "en", "desc": "Turquoise blue mirror sunnies H&M", "photo": "https://images1.vinted.net/t/04_01e6a_sQ4iUv6XjrdfU7GdV2wkhWXm/f800/1780479469.jpeg?s=242ccc6d149a286d4c58d067752e9f288fa6df4a", "country": "Pays-Bas", "attrs": ["unknown"], "source": "gemini-escalation", "fit": 40, "best": false}]},
+{"seq": 26, "kind": "message", "actor": "buyer", "text": "accessories: pick '3 Sunglasses Bundle: White Shield, Mirrored Lens, Orange Acetate Frames' €3.0 (fit 58%)"},
+{"seq": 27, "kind": "budget", "actor": "procurement", "text": "Absorbed €1 overspend on accessories from slack"},
+{"seq": 28, "kind": "decision", "actor": "coordinator", "text": "Acquire accessories: '3 Sunglasses Bundle: White Shield, Mirrored Lens, Orange Acetate Frames' @ €3 | remaining €0"},
+{"seq": 29, "kind": "decision", "actor": "coordinator", "text": "Outfit: 4/4 items, total €20 / €20"},
+{"seq": 30, "kind": "links", "actor": "coordinator", "text": "Here are the exact listings — open each one to review and check out yourself (I never spend money for you):", "links": [{"title": "Chunky Black Platform Lace-Up Shoes", "url": "https://www.vinted.fr/items/8878313510-chunky-black-platform-lace-up-shoes"}, {"title": "Black mesh sparkle shirt from Atmosphere", "url": "https://www.vinted.fr/items/8169828064-black-mesh-sparkle-shirt-from-atmosphere"}, {"title": "Schwarze Parachute Cargo Hose im Baggy Fit", "url": "https://www.vinted.fr/items/8936531669-schwarze-parachute-cargo-hose-im-baggy-fit"}, {"title": "3 Sunglasses Bundle: White Shield, Mirrored Lens, Orange Acetate Frames", "url": "https://www.vinted.fr/items/9146002114-3-sunglasses-bundle-white-shield-mirrored-lens-orange-acetate-frames"}]},
+{"seq": 31, "kind": "escalation", "actor": "coordinator", "text": "CONFIRM purchase (spends money / real-world action)"},
+{"seq": 32, "kind": "human_reply", "actor": "human", "text": "confirm"},
+{"seq": 33, "kind": "deal", "actor": "coordinator", "text": "Purchase confirmed"},
+{"seq": 34, "kind": "message", "actor": "coordinator", "text": "Paid online — top from France, bottoms from Allemagne, accessories from Pays-Bas will ship. Orders placed, I've messaged each seller; tracking to follow."},
+{"seq": 35, "kind": "message", "actor": "coordinator", "text": "The boots seller is local in Berchem. For that one: bring €10 cash and tap to send the pickup message I drafted. (Everything else ships.)"}
 ];
 const SCEN = {
-  brunch:{cap:60, slots:["dress","shoes","bag","jewellery"], events:EMBEDDED,
-    mission:"“Sunday brunch with the girls — cute but comfy.” Budget €60. The org styles it, escalates to you, and negotiates the over-budget dress down."},
-  tomorrowland:{cap:80, slots:["top","bottoms","accessories","boots"], events:EMBEDDED_TOMORROWLAND,
-    mission:"“Tomorrowland mainstage — bold, rave-ready.” Budget €80. The hero boots blow the budget, so on ‘stretch’ procurement reallocates from other categories."},
+  brunch:{cap:30, slots:["dress","shoes","bag","jewellery"], events:EMBEDDED,
+    mission:"“Sunday brunch with the girls — cute but comfy.” Budget €30. The org styles it, escalates to you, and negotiates the over-budget dress down to land at €29/€30."},
+  tomorrowland:{cap:20, slots:["boots","top","bottoms","accessories"], events:EMBEDDED_TOMORROWLAND,
+    mission:"“Tomorrowland mainstage — bold, rave-ready.” Budget €20. The hero boots are sourced FIRST and blow their slice, so on ‘stretch’ procurement trims every other category to fund them — landing at €20/€20."},
 };
 const roster=document.getElementById('roster'), feed=document.getElementById('feed'),
       outfit=document.getElementById('outfit'), ring=document.getElementById('ring'),
@@ -330,6 +353,15 @@ function render(ev){
     body.appendChild(el('span','k','finds'));
     if(ev.text) body.appendChild(document.createTextNode(ev.text));
     body.appendChild(buildCards(ev.candidates));
+  } else if(ev.kind==='links' && ev.links){
+    body.appendChild(el('span','k','checkout'));
+    if(ev.text) body.appendChild(document.createTextNode(ev.text));
+    const wrap=el('div','links');
+    ev.links.forEach(l=>{ const u=safeUrl(l.url); if(!u) return;
+      const a=document.createElement('a'); a.href=u; a.target='_blank'; a.rel='noopener noreferrer';
+      a.className='listing-link'; a.textContent='↗ '+(l.title||u);   // title is UNTRUSTED → textContent
+      wrap.appendChild(a); });
+    body.appendChild(wrap);
   } else {
     body.appendChild(el('span','k',ev.kind.replace('_',' ')));
     if(ev.text) body.appendChild(document.createTextNode(ev.text));
@@ -370,7 +402,27 @@ document.querySelectorAll('.scn button').forEach(b=>{
 // ---- Live mode: drive the real coordinator over SSE -----------------------
 let LAST_PLAYABLE='brunch', es=null;
 function buzz(on){ const h=nodeEls['human']; if(h) h.classList.toggle('buzz', on); }
-function playAudio(url){ if(!url) return; voice.src=url; voice.play().catch(()=>{}); }
+// Browsers block programmatic audio until the page has had a real user gesture.
+// We "prime" the <audio> element on the first tap/click (a silent WAV) so later
+// pings — which arrive asynchronously over SSE, not from a click — are allowed to
+// play. Without this, the first ping (or all of them) silently fails autoplay.
+let _audioReady=false;
+function _silentWavUrl(){
+  const sr=8000,n=4,buf=new ArrayBuffer(44+n*2),v=new DataView(buf);
+  const w=(o,s)=>{for(let i=0;i<s.length;i++)v.setUint8(o+i,s.charCodeAt(i));};
+  w(0,'RIFF');v.setUint32(4,36+n*2,true);w(8,'WAVE');w(12,'fmt ');v.setUint32(16,16,true);
+  v.setUint16(20,1,true);v.setUint16(22,1,true);v.setUint32(24,sr,true);v.setUint32(28,sr*2,true);
+  v.setUint16(32,2,true);v.setUint16(34,16,true);w(36,'data');v.setUint32(40,n*2,true);
+  return URL.createObjectURL(new Blob([buf],{type:'audio/wav'}));
+}
+function primeAudio(){ if(_audioReady) return;
+  try{ voice.src=_silentWavUrl(); const p=voice.play();
+    if(p) p.then(()=>{_audioReady=true;}).catch(()=>{}); else _audioReady=true; }catch(e){} }
+document.addEventListener('pointerdown', primeAudio, {capture:true});
+function playAudio(url){ if(!url) return; voice.src=url;
+  const p=voice.play();
+  if(p) p.catch(()=>{ hint.textContent='🔊 Tap anywhere once to enable Lupo’s voice, then continue.'; });
+}
 function hidePrompt(){ promptEl.classList.remove('show'); promptopts.innerHTML=''; promptinput.value=''; buzz(false); }
 function respond(answer){ hidePrompt();
   fetch('/respond',{method:'POST',headers:{'Content-Type':'application/json'},
@@ -387,6 +439,7 @@ promptinput.addEventListener('keydown',e=>{ if(e.key==='Enter'&&promptinput.valu
 document.getElementById('promptsend').onclick=()=>{ if(promptinput.value.trim()) respond(promptinput.value.trim()); };
 
 function runLive(){
+  primeAudio();   // this is a click handler — unlock audio for the pings that follow
   const scn=LAST_PLAYABLE;
   CUR='live'; SCEN.live={cap:SCEN[scn].cap, slots:SCEN[scn].slots, events:[],
     mission:SCEN[scn].mission.replace(/^/,'LIVE · ')};
@@ -403,15 +456,23 @@ function runLive(){
     const msg=JSON.parse(e.data);
     if(msg.type==='event') render(msg);
     else if(msg.type==='prompt') showPrompt(msg);
-    else if(msg.type==='instruct'){ render({kind:'message',actor:'coordinator',text:msg.message}); playAudio(msg.audio_url); }
+    // instruct = the SPOKEN ping. Its text is always also emitted as a 'message'/'links'
+    // event (which renders the row), so here we only play the voice — rendering it again
+    // would duplicate the line in the feed.
+    else if(msg.type==='instruct'){ setActive('coordinator'); playAudio(msg.audio_url); }
     else if(msg.type==='done'){ hint.textContent='Mission complete.'; if(es){es.close();es=null;} setActive(null); }
   };
   es.onerror=()=>{ hint.textContent='Stream closed (start the server with python -m lupo.server).'; };
 }
 document.getElementById('runlive').onclick=runLive;
 
+// "Run live" drives whichever scenario you last selected (brunch/tomorrowland). Show
+// that target ON the button so it can never be ambiguous which one will run live —
+// previously, viewing a scenario offline silently changed what "Run live" launched.
+const runliveBtn=document.getElementById('runlive');
+function updateLiveLabel(){ runliveBtn.textContent='● Run live: '+(LAST_PLAYABLE==='tomorrowland'?'Tomorrowland':'Brunch'); }
 const _origLoad=loadScenario;
-loadScenario=function(name){ if(name==='brunch'||name==='tomorrowland') LAST_PLAYABLE=name;
+loadScenario=function(name){ if(name==='brunch'||name==='tomorrowland'){ LAST_PLAYABLE=name; updateLiveLabel(); }
   if(es){ es.close(); es=null; } _origLoad(name); };
 loadScenario('brunch');
 </script>

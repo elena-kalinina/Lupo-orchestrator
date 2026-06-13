@@ -1,0 +1,294 @@
+{
+  "base_model": "fastino/gliner2-base-v1",
+  "trained_model_id": "b8210478-8cd3-43f6-9efe-8bae982b1af4",
+  "rows": [
+    {
+      "text": "robe midi fleurie en coton, style bohème, taille normale",
+      "base": {
+        "type": "encoder",
+        "inference_id": "c1d330a5-9e6f-4c5e-a01f-f645a1df36da",
+        "result": {
+          "request_id": null,
+          "created_at": 1781365393,
+          "data": {
+            "entities": {
+              "material": [
+                {
+                  "text": "coton",
+                  "confidence": 1.0,
+                  "start": 21,
+                  "end": 26
+                }
+              ],
+              "style": [
+                {
+                  "text": "bohème",
+                  "confidence": 1.0,
+                  "start": 34,
+                  "end": 40
+                }
+              ],
+              "fit": [
+                {
+                  "text": "taille normale",
+                  "confidence": 0.99853515625,
+                  "start": 42,
+                  "end": 56
+                }
+              ]
+            }
+          }
+        },
+        "model_id": "fastino/gliner2-base-v1",
+        "latency_ms": 792.4482822418213,
+        "token_usage": 116,
+        "model_used": "fastino/gliner2-base-v1"
+      },
+      "trained": {
+        "type": "encoder",
+        "inference_id": "bd6bb3fd-b177-46d7-92b9-367e35567986",
+        "result": {
+          "request_id": null,
+          "created_at": 1781365394,
+          "data": {
+            "entities": {
+              "material": [
+                {
+                  "text": "coton",
+                  "confidence": 0.96630859375,
+                  "start": 21,
+                  "end": 26
+                }
+              ],
+              "style": [
+                {
+                  "text": "bohème",
+                  "confidence": 0.9990234375,
+                  "start": 34,
+                  "end": 40
+                }
+              ],
+              "fit": [
+                {
+                  "text": "normale",
+                  "confidence": 0.91455078125,
+                  "start": 49,
+                  "end": 56
+                }
+              ]
+            }
+          }
+        },
+        "model_id": "b8210478-8cd3-43f6-9efe-8bae982b1af4",
+        "latency_ms": 254.7435760498047,
+        "token_usage": 121,
+        "model_used": "b8210478-8cd3-43f6-9efe-8bae982b1af4"
+      }
+    },
+    {
+      "text": "leren jas, valt groot, vintage",
+      "base": {
+        "type": "encoder",
+        "inference_id": "22ea511e-1c1e-4c6d-b591-87dce8b84016",
+        "result": {
+          "request_id": null,
+          "created_at": 1781365395,
+          "data": {
+            "entities": {
+              "material": [],
+              "style": [
+                {
+                  "text": "vintage",
+                  "confidence": 0.9951171875,
+                  "start": 23,
+                  "end": 30
+                }
+              ],
+              "fit": []
+            }
+          }
+        },
+        "model_id": "fastino/gliner2-base-v1",
+        "latency_ms": 76.01499557495117,
+        "token_usage": 52,
+        "model_used": "fastino/gliner2-base-v1"
+      },
+      "trained": {
+        "type": "encoder",
+        "inference_id": "8d06ef1a-c6c1-4858-b397-7a890a37ef17",
+        "result": {
+          "request_id": null,
+          "created_at": 1781365396,
+          "data": {
+            "entities": {
+              "material": [],
+              "style": [
+                {
+                  "text": "vintage",
+                  "confidence": 0.99462890625,
+                  "start": 23,
+                  "end": 30
+                }
+              ],
+              "fit": []
+            }
+          }
+        },
+        "model_id": "b8210478-8cd3-43f6-9efe-8bae982b1af4",
+        "latency_ms": 98.72579574584961,
+        "token_usage": 52,
+        "model_used": "b8210478-8cd3-43f6-9efe-8bae982b1af4"
+      }
+    },
+    {
+      "text": "vestito di seta, anni 2000",
+      "base": {
+        "type": "encoder",
+        "inference_id": "39833bf6-362d-4412-94c6-ab42e78f3346",
+        "result": {
+          "request_id": null,
+          "created_at": 1781365396,
+          "data": {
+            "entities": {
+              "material": [
+                {
+                  "text": "seta",
+                  "confidence": 0.99853515625,
+                  "start": 11,
+                  "end": 15
+                }
+              ],
+              "style": [],
+              "fit": [
+                {
+                  "text": "vestito",
+                  "confidence": 0.771484375,
+                  "start": 0,
+                  "end": 7
+                }
+              ]
+            }
+          }
+        },
+        "model_id": "fastino/gliner2-base-v1",
+        "latency_ms": 67.65246391296387,
+        "token_usage": 82,
+        "model_used": "fastino/gliner2-base-v1"
+      },
+      "trained": {
+        "type": "encoder",
+        "inference_id": "41515dd0-213e-450d-a9b0-c28167d80a9c",
+        "result": {
+          "request_id": null,
+          "created_at": 1781365397,
+          "data": {
+            "entities": {
+              "material": [
+                {
+                  "text": "seta",
+                  "confidence": 0.998046875,
+                  "start": 11,
+                  "end": 15
+                }
+              ],
+              "style": [],
+              "fit": [
+                {
+                  "text": "vestito",
+                  "confidence": 0.81591796875,
+                  "start": 0,
+                  "end": 7
+                }
+              ]
+            }
+          }
+        },
+        "model_id": "b8210478-8cd3-43f6-9efe-8bae982b1af4",
+        "latency_ms": 156.63838386535645,
+        "token_usage": 82,
+        "model_used": "b8210478-8cd3-43f6-9efe-8bae982b1af4"
+      }
+    },
+    {
+      "text": "Wollpullover, getragen, normale Größe",
+      "base": {
+        "type": "encoder",
+        "inference_id": "bb5e08b4-cbc5-4584-b4bb-a65c09a7ea61",
+        "result": {
+          "request_id": null,
+          "created_at": 1781365397,
+          "data": {
+            "entities": {
+              "material": [],
+              "style": [
+                {
+                  "text": "normale",
+                  "confidence": 0.96337890625,
+                  "start": 24,
+                  "end": 31
+                }
+              ],
+              "fit": [
+                {
+                  "text": "Wollpullover",
+                  "confidence": 0.9833984375,
+                  "start": 0,
+                  "end": 12
+                },
+                {
+                  "text": "getragen",
+                  "confidence": 0.9765625,
+                  "start": 14,
+                  "end": 22
+                }
+              ]
+            }
+          }
+        },
+        "model_id": "fastino/gliner2-base-v1",
+        "latency_ms": 66.72525405883789,
+        "token_usage": 113,
+        "model_used": "fastino/gliner2-base-v1"
+      },
+      "trained": {
+        "type": "encoder",
+        "inference_id": "5d759ec4-1308-48d7-87ea-343f4b96263b",
+        "result": {
+          "request_id": null,
+          "created_at": 1781365398,
+          "data": {
+            "entities": {
+              "material": [],
+              "style": [
+                {
+                  "text": "normale",
+                  "confidence": 0.95947265625,
+                  "start": 24,
+                  "end": 31
+                }
+              ],
+              "fit": [
+                {
+                  "text": "Wollpullover",
+                  "confidence": 0.9765625,
+                  "start": 0,
+                  "end": 12
+                },
+                {
+                  "text": "getragen",
+                  "confidence": 0.96923828125,
+                  "start": 14,
+                  "end": 22
+                }
+              ]
+            }
+          }
+        },
+        "model_id": "b8210478-8cd3-43f6-9efe-8bae982b1af4",
+        "latency_ms": 158.06961059570312,
+        "token_usage": 113,
+        "model_used": "b8210478-8cd3-43f6-9efe-8bae982b1af4"
+      }
+    }
+  ]
+}

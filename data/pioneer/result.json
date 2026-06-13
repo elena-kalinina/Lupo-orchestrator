@@ -1,0 +1,20 @@
+{
+  "run_date": "2026-06-13",
+  "base_model": "fastino/gliner2-base-v1",
+  "trained_job_id": "b8210478-8cd3-43f6-9efe-8bae982b1af4",
+  "dataset_name": "lupo-attrs-v1",
+  "training_rows": 38,
+  "labels": ["material", "style", "fit"],
+  "training_type": "lora",
+  "epochs": 5,
+  "learning_rate": 5e-05,
+  "final_training_loss": 12.932996,
+  "final_validation_loss": 37.225644,
+  "eval": {
+    "base":    {"f1": 0.18781, "precision": 0.15040, "recall": 0.25000, "accuracy": 0.60158},
+    "trained": {"f1": 0.26667, "precision": 0.22222, "recall": 0.33333, "accuracy": 0.66667},
+    "f1_delta": 0.07886,
+    "f1_relative_gain": "+42%"
+  },
+  "note": "Adaptive-inference loop: GLiNER2 escalations to Gemini are harvested (scripts/harvest_samples.py) into a labelled NER set, then LoRA-finetuned on Pioneer. Real before/after on the same held-out dataset."
+}

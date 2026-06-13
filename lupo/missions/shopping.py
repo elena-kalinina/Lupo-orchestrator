@@ -18,10 +18,15 @@ def _seller_factory(events):
     return make
 
 
+# Budgets + per-component allocations are tuned to the REAL cached Vinted prices
+# (second-hand finds are cheap), so the coordination drama still fires:
+#   brunch  — the dress lands over its €11 slice -> the coordinator negotiates it down.
+#   tomorrowland — the hero boots blow their €6 slice -> procurement REALLOCATES slack.
 SCENARIOS = {
     "brunch": {
         "brief": "Sunday brunch with the girls — cute but comfy",
-        "budget": 60.0,
+        "budget": 30.0,
+        "allocations": {"dress": 11.0, "shoes": 6.0, "bag": 6.0, "jewellery": 7.0},
         "script": [
             ("amendments", "amend: ballet flats instead of sandals, and a small shoulder bag"),
             ("budget split", "approve"),
@@ -31,7 +36,8 @@ SCENARIOS = {
     },
     "tomorrowland": {
         "brief": "Tomorrowland mainstage, Saturday night — bold, rave-ready, danceable",
-        "budget": 80.0,
+        "budget": 20.0,
+        "allocations": {"boots": 6.0, "top": 5.0, "bottoms": 6.0, "accessories": 3.0},
         "script": [
             ("amendments", "amend: make it a mesh top and add some sparkle"),
             ("budget split", "approve"),
@@ -54,7 +60,7 @@ def run(scenario="brunch", human=None, events=None):
 
     coord = Coordinator(events, human, stylist, buyer, procurement,
                         negotiator, _seller_factory(events))
-    ledger = coord.run(cfg["brief"], cfg["budget"])
+    ledger = coord.run(cfg["brief"], cfg["budget"], allocations=cfg.get("allocations"))
     return ledger, events
 
 

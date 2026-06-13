@@ -1,13 +1,17 @@
 [
   {
-    "id": "b1",
-    "title": "Raffia tote bag straw",
-    "price": 16,
-    "size": "OS",
-    "brand": "Mango",
-    "seller_id": "s7",
+    "id": "3862152533",
+    "title": "bolsa playa",
+    "desc": "bolsa playa",
+    "price": 5.0,
+    "size": "",
+    "brand": "",
+    "seller_id": "122409506",
+    "photo": "https://images1.vinted.net/t/01_0135b_hBf6V9pRMT6yau89gxtCymxv/f800/1702123406.jpeg?s=9df63af36c569bc7650fe04cd166fb6bbf721390",
+    "country": "Espagne",
+    "url": "https://www.vinted.fr/items/3862152533-bolsa-playa",
     "persona": "flexible",
-    "photo": "https://img/b1.jpg",
-    "url": "https://vinted/b1"
+    "country_code": "ES",
+    "city": "Molins de Rei"
   }
 ]

@@ -1,0 +1,41 @@
+[
+  {
+    "id": "d1",
+    "title": "Zara floral midi casual dress",
+    "desc": "Robe midi fleurie en coton, style bohème, portée une fois, taille normale",
+    "price": 32,
+    "size": "M",
+    "brand": "Zara",
+    "seller_id": "s1",
+    "persona": "flexible",
+    "photo": "https://img/d1.jpg",
+    "url": "https://vinted/d1",
+    "country": "France"
+  },
+  {
+    "id": "d2",
+    "title": "H&M cream sundress",
+    "desc": "Lichte zomerjurk, katoen, valt klein",
+    "price": 18,
+    "size": "M",
+    "brand": "H&M",
+    "seller_id": "s2",
+    "persona": "firm",
+    "photo": "https://img/d2.jpg",
+    "url": "https://vinted/d2",
+    "country": "Netherlands"
+  },
+  {
+    "id": "d3",
+    "title": "Mango midi floral",
+    "desc": "vestito midi a fiori, nuovo con cartellino",
+    "price": 24,
+    "size": "S",
+    "brand": "Mango",
+    "seller_id": "s3",
+    "persona": "motivated",
+    "photo": "https://img/d3.jpg",
+    "url": "https://vinted/d3",
+    "country": "Italy"
+  }
+]

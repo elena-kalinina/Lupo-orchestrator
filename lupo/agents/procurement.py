@@ -19,27 +19,43 @@ class Procurement(Agent):
 
     def allocate(self, ledger):
         total = ledger.total_budget
+        fixed = getattr(ledger, "allocations", None) or {}
         for c in ledger.components:
-            c.allocation = round(total * self.WEIGHTS.get(c.name, 1 / len(ledger.components)), 2)
+            if c.name in fixed:                       # scenario-tuned sub-budget
+                c.allocation = round(float(fixed[c.name]), 2)
+            else:
+                c.allocation = round(total * self.WEIGHTS.get(c.name, 1 / len(ledger.components)), 2)
         self.emit("budget", text="Allocations: "
                   + ", ".join(f"{c.name} €{c.allocation:.0f}" for c in ledger.components))
 
     def reallocate(self, ledger, component, needed):
-        """STRETCH-by-reallocation: trim slack from other (already-settled) categories
-        and pour it into `component`, keeping the total envelope fixed. Returns freed."""
-        freed = 0.0
+        """STRETCH-by-reallocation: trim slack from the OTHER categories and pour it into
+        `component`, keeping the total envelope fixed. The trim is spread PROPORTIONALLY
+        to each category's available slack, so funding an over-budget hero (e.g. the
+        boots, procured first) tightens every other slice a little rather than starving
+        one. Returns the euros freed."""
+        others = []
         for c in ledger.components:
-            if c is component or freed >= needed:
+            if c is component:
                 continue
             spent = (c.final_price if c.status == "acquired"
                      else (c.chosen["price"] if c.chosen else 0)) or 0
             slack = max(0, c.allocation - spent)
-            take = min(slack, needed - freed)
+            if slack > 0:
+                others.append((c, slack))
+        total_slack = round(sum(s for _, s in others), 2)
+        take_total = round(min(needed, total_slack), 2)
+        others.sort(key=lambda x: -x[1])              # largest slack absorbs the remainder
+        freed, remaining = 0.0, take_total
+        for i, (c, slack) in enumerate(others):
+            take = remaining if i == len(others) - 1 else round(take_total * slack / total_slack, 2)
+            take = min(take, slack, remaining)
             c.allocation = round(c.allocation - take, 2)
-            freed += take
+            freed = round(freed + take, 2)
+            remaining = round(remaining - take, 2)
         component.allocation = round(component.allocation + freed, 2)
         self.emit("budget", text=f"Reallocated €{freed:.0f} from other categories → {component.name}")
-        return round(freed, 2)
+        return freed
 
     def check(self, ledger, component, price):
         """Return (ok, overspend, slack). Auto-absorbs only TRIVIAL overspend; a
