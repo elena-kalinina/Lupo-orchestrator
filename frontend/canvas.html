@@ -419,9 +419,20 @@ function primeAudio(){ if(_audioReady) return;
   try{ voice.src=_silentWavUrl(); const p=voice.play();
     if(p) p.then(()=>{_audioReady=true;}).catch(()=>{}); else _audioReady=true; }catch(e){} }
 document.addEventListener('pointerdown', primeAudio, {capture:true});
-function playAudio(url){ if(!url) return; voice.src=url;
+// Pings can arrive back-to-back (e.g. "I lined up listings" immediately followed by
+// the confirm prompt, or the two logistics lines). A single <audio> element can only
+// play one clip at a time, so playing the next would cut the previous one off. Queue
+// them and play strictly in order, each clip waiting for the one before it to finish.
+let _audioQ=[], _audioBusy=false;
+function playAudio(url){ if(!url) return; _audioQ.push(url); _drainAudio(); }
+function _drainAudio(){
+  if(_audioBusy || !_audioQ.length) return;
+  const url=_audioQ.shift(); _audioBusy=true;
+  const next=()=>{ voice.onended=null; voice.onerror=null; _audioBusy=false; _drainAudio(); };
+  voice.onended=next; voice.onerror=next;
+  voice.src=url;
   const p=voice.play();
-  if(p) p.catch(()=>{ hint.textContent='🔊 Tap anywhere once to enable Lupo’s voice, then continue.'; });
+  if(p) p.catch(()=>{ hint.textContent='🔊 Tap anywhere once to enable Lupo’s voice, then continue.'; next(); });
 }
 function hidePrompt(){ promptEl.classList.remove('show'); promptopts.innerHTML=''; promptinput.value=''; buzz(false); }
 function respond(answer){ hidePrompt();

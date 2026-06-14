@@ -15,7 +15,12 @@ from . import config
 
 def describe(palette, components):
     """Build a text-to-image prompt from the structured outfit spec."""
-    items = ", ".join(f"{'/'.join(c.style_tags[:2])} {c.name}" for c in components)
+    def _item(c):
+        desc = f"{'/'.join(c.style_tags[:2])} {c.name}"
+        # The real brunch find is a plain BEIGE 'clean girl' dress, not a vivid print —
+        # ask for a soft pastel dress so the preview matches what actually ships.
+        return f"pastel-coloured {desc}" if c.name == "dress" else desc
+    items = ", ".join(_item(c) for c in components)
     pal = ", ".join(palette)
     return (f"Full-length editorial lookbook photo of a model wearing a coordinated "
             f"outfit: {items}. Colour palette: {pal}. The model stands centered, the "
@@ -36,7 +41,7 @@ def generate(palette, components):
         try:
             import fal_client
             result = fal_client.subscribe(
-                os.getenv("FAL_IMAGE_MODEL", "fal-ai/flux/schnell"),
+                os.getenv("FAL_IMAGE_MODEL", "fal-ai/bytedance/seedream/v4/text-to-image"),
                 # tall portrait frames a full standing model head-to-toe (the canvas shows it
                 # with object-fit:contain, so the whole figure is visible, not a centre crop).
                 arguments={"prompt": prompt,
