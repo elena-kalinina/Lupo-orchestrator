@@ -60,7 +60,10 @@ To finalise the real integrations on hackathon day, follow **`IMPLEMENTATION_PLA
 ---
 
 ## Architecture
-See **`ARCHITECTURE.md`** (and `frontend/architecture.svg`) for the full picture. In short:
+
+![Lupo architecture — Coordinator at the centre, human-in-the-loop channel, model-arbitration loop (GLiNER2 ⇄ Gemini), and a swappable agent roster over a domain layer](frontend/architecture.svg)
+
+See **`ARCHITECTURE.md`** for the full picture. In short:
 
 **The domain-agnostic core** (never changes between use cases):
 - **Coordinator** — the star. Routes work to agents, holds the shared **ledger** (the
