@@ -55,8 +55,6 @@ Then open the visuals (double-click):
 - **`frontend/walkthrough.html`** — a narrated storyboard of the same run.
 - **`frontend/architecture.svg`** — the architecture diagram (for the video).
 
-To finalise the real integrations on hackathon day, follow **`IMPLEMENTATION_PLAN.md`**.
-
 ---
 
 ## Architecture
