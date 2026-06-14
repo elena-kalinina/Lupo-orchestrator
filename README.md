@@ -215,6 +215,8 @@ against your key before the demo.
   (the voice pings); the arbitration target for hard cases.
 - **Fastino / GLiNER** — the small multilingual extractor; **Pioneer** for fine-tuning on
   Lupo's own escalation traces (adaptive inference). Metrics harness: `scripts/finetune_gliner.py`.
+- **fal.ai** — text-to-image outfit previews (ByteDance Seedream 4) rendered when the
+  stylist proposes the look and re-rendered on each amendment. Integration: `lupo/lookbook.py`.
 - **Aikido** — supply-chain/runtime security scan for the "most secure build" prize;
   prompt-injection resistance is handled by the architecture (Coordinator validates, human confirms).
 
